@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MultScan</title>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css">
+    <!-- Styling -->
+    <style>
+        * {
+            font-size: large;
+            font-family: monospace;
+        }
+
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+        }
+
+        body {
+            max-width: 45%;
+            margin: auto;
+            color: var(--black);
+            background-color: var(--white);
+        }
+
+        h1 {
+            color: var(--black);
+            border-bottom: 1px dashed var(--black);
+        }
+
+        h2 {
+            margin-top: 10px;
+            margin-bottom: 5px;
+            padding-top: 50px;
+            border-top: 1px dashed var(--black);
+            border-bottom: 1px dashed var(--black);
+        }
+
+        h1,
+        h2 {
+            font-size: 24px;
+        }
+
+        p {
+            color: var(--black);
+            font-size: 13px;
+        }
+
+        textarea {
+            width: 95%;
+        }
+
+        a {
+            font-weight: lighter;
+            font-size: large;
+            color: var(--black);
+            text-decoration: none;
+        }
+
+        a:hover,
+        a:active {
+            color: var(--black);
+            text-decoration: underline;
+        }
+
+        .desc {
+            margin-top: 0px;
+            margin-bottom: 0px;
+        }
+
+        .brief {
+            color: var(--black);
+        }
+
+        @media all and (orientation:landscape) {
+            html {
+                background-color: var(--white);
+            }
+
+            body {
+                padding: 5%;
+                padding-top: 1%;
+                margin-top: 2%;
+                background-color: var(--white);
+                box-shadow: 25px 20px 1px var(--white);
+                border-radius: 2px;
+                border: 1px solid white;
+            }
+
+            h1 {
+                text-align: center;
+                text-shadow: 4px 4px 2px var(--white);
+                padding: 0;
+            }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+            padding: 20px;
+            color: var(--black);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Custom Spinner */
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 6px solid transparent;
+            border-top-color: #000000;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>MultScan</h1>
+    <!-- Align image to center-->
+    <p style="text-align: center;">
+        <img width="125px" src="static/MultScan.png" />
+    </p>
+    <p>
+        <i>MultScan is a self-hosted malware scanner, created by <a href="https://infosec.exchange/@Pengrey">@Pengrey</a>. </i>
+    </p>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <!-- File Upload -->
+        <div class="files" id="files">
+            <div class="border p-3 mb-3" id="dropArea" ondrop="handleDrop(event)" ondragover="handleDragOver(event)">
+                <!-- Placeholder for the dropped or chosen file -->
+                <p style="text-align: center;">Drag and drop a bin file here <br> or<br>
+                    <input type="file" id="fileInput" name="payload">
+                </p>
+            </div>
+        </div>
+    </form>
+    <div>
+        <br />
+        <button id="scanButton" class="btn btn-secondary btn-lg btn-block" style="margin-left: 5px;">Scan</button>
+    </div>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <div class="spinner"></div>
+    </div>
+
+    <div id="resultsTableContainer" style="display:none;">
+        <h2>Scan Results</h2>
+        <table id="resultsTable" class="table">
+            <!-- Table rows will be filled dynamically -->
+        </table>
+    </div>
+
+    <script>
+        // Function to handle drag and drop events
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'copy';
+        }
+
+        // Function to handle the dropped file
+        function handleDrop(event) {
+            event.preventDefault();
+            // Get the file from the event
+            var file = event.dataTransfer.files[0];
+            // Set the file input to the file
+            document.getElementById('fileInput').files = event.dataTransfer.files;
+        }
+
+        // Function to handle scanning
+        function scanFile() {
+            var file = document.getElementById('fileInput').files[0];
+            if (!file) {
+                alert("Please select a file to scan.");
+                return;
+            }
+
+            // Show modal
+            document.getElementById('myModal').style.display = 'block';
+
+            // Simulate scanning process (replace with actual scanning logic)
+            setTimeout(function () {
+                var scanResults = generateScanResults(); // Replace this with actual scan results
+                displayResults(scanResults);
+                // Close modal
+                document.getElementById('myModal').style.display = 'none';
+                // Show results
+                document.getElementById('resultsTableContainer').style.display = 'block';
+            }, 3000); // Simulating 3 seconds of scanning
+        }
+
+        // Function to generate scan results (replace with actual logic)
+        function generateScanResults() {
+            // Example scan results
+            return [
+                { name: "Suspicious File 1", status: "Infected" },
+                { name: "Suspicious File 2", status: "Clean" },
+                // Add more scan results as needed
+            ];
+        }
+
+        // Function to display scan results in table
+        function displayResults(results) {
+            var table = document.getElementById('resultsTable');
+            // Clear existing rows
+            table.innerHTML = '';
+            // Add header row
+            var headerRow = table.insertRow();
+            headerRow.insertCell().innerHTML = "<b>File Name</b>";
+            headerRow.insertCell().innerHTML = "<b>Status</b>";
+            // Add scan result rows
+            results.forEach(function (result) {
+                var row = table.insertRow();
+                row.insertCell().innerText = result.name;
+                row.insertCell().innerText = result.status;
+            });
+        }
+
+        // Scan button click event
+        document.getElementById('scanButton').addEventListener('click', function () {
+            scanFile();
+        });
+
+        // Prevent form submission
+        document.getElementById('uploadForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+        });
+
+    </script>
+</body>
+</html>
