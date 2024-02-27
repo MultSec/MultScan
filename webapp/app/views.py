@@ -1,6 +1,5 @@
 from flask import render_template, request, redirect
 from app import app
-import importlib
 
 # favicon.ico route
 @app.route('/favicon.ico')
@@ -10,8 +9,22 @@ def favicon():
 
 # Define the route that will serve the loader configuration
 @app.route('/', methods=['GET'])
-def serve_conf():
+def index():
     return render_template('index.html')
+
+# Define the route that will generate the loader
+@app.route('/', methods=['POST'])
+def scanFile():
+    # Check if the payload file was uploaded
+    if 'payload' not in request.files:
+        return redirect(request.url)
+    payload = request.files['payload']
+
+    # Scan the payload against AVs
+    scan(payload)
+
+    # redirect to index
+    return redirect(request.url)
 
 # Route for errors
 @app.errorhandler(404)
