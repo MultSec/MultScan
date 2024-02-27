@@ -65,7 +65,7 @@ The machines section is used to define the machines that MultScan will use for s
 ### To-Do
 
 - [ ] Dockerized
-- [ ] Web UI
+- [x] Web UI
 - [ ] File Upload
 - [ ] File Hashing
 - [ ] REST API

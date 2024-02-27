@@ -37,8 +37,7 @@
             border-bottom: 1px dashed var(--black);
         }
 
-        h1,
-        h2 {
+        h1, h2 {
             font-size: 24px;
         }
 
@@ -69,19 +68,13 @@
             margin-bottom: 0px;
         }
 
-        .brief {
-            color: var(--black);
-        }
-
         @media all and (orientation:landscape) {
             html {
                 background-color: var(--white);
             }
 
             body {
-                padding: 5%;
-                padding-top: 1%;
-                margin-top: 2%;
+                padding: 2%;
                 background-color: var(--white);
                 box-shadow: 25px 20px 1px var(--white);
                 border-radius: 2px;
@@ -163,11 +156,26 @@
         <div class="spinner"></div>
     </div>
 
-    <div id="resultsTableContainer" style="display:none;">
+    <div id="resultsContainer" style="display:none;">
+        <h2>File Info</h2>
+        <table id="fileInfo" class="table">
+            <!-- Table rows will be filled dynamically -->
+        </table>
+        <br>
         <h2>Scan Results</h2>
         <table id="resultsTable" class="table">
             <!-- Table rows will be filled dynamically -->
         </table>
+    </div>
+
+    <!-- BadBytes Modal -->
+    <div id="badBytesModal" class="modal" style="width: 45%; height: 45%;">
+        <span class="close">&times;</span>
+        <h1>Hexdump of detected bad bytes</h2>
+        <!-- Center the div inside the modal -->
+        <div style="background-color: #f2f2f2; padding: 20px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <pre id="badBytes" style="overflow: auto;"></pre>
+        </div>
     </div>
 
     <script>
@@ -186,6 +194,23 @@
             document.getElementById('fileInput').files = event.dataTransfer.files;
         }
 
+        // Function to get scan results from the server
+        function getScanResults() {
+            // Query the server for scan results from '/api/v1.0/scan/status' endpoint
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', '/api/v1.0/scan/status', false);
+            xhr.send();
+
+            if (xhr.status === 200) {
+                return JSON.parse(xhr.responseText);
+            } else {
+                alert('Error getting scan results');
+            }
+
+            return null;
+        }
+
         // Function to handle scanning
         function scanFile() {
             var file = document.getElementById('fileInput').files[0];
@@ -197,42 +222,82 @@
             // Show modal
             document.getElementById('myModal').style.display = 'block';
 
-            // Simulate scanning process (replace with actual scanning logic)
-            setTimeout(function () {
-                var scanResults = generateScanResults(); // Replace this with actual scan results
-                displayResults(scanResults);
-                // Close modal
-                document.getElementById('myModal').style.display = 'none';
-                // Show results
-                document.getElementById('resultsTableContainer').style.display = 'block';
-            }, 3000); // Simulating 3 seconds of scanning
+            // Hide modal and display results and file info after results return status 'done', when querying the server every 5 seconds
+            var interval = setInterval(function () {
+                var results = getScanResults();
+                if (results.status === 'done') {
+                    clearInterval(interval);
+                    document.getElementById('myModal').style.display = 'none';
+                    document.getElementById('resultsContainer').style.display = 'block';
+                    displayFileInfo(results);
+                    displayResults(results);
+                }
+            }, 5000);
         }
 
-        // Function to generate scan results (replace with actual logic)
-        function generateScanResults() {
-            // Example scan results
-            return [
-                { name: "Suspicious File 1", status: "Infected" },
-                { name: "Suspicious File 2", status: "Clean" },
-                // Add more scan results as needed
-            ];
+        // Function to display file info
+        function displayFileInfo(results) {
+            var fileInfoDiv = document.getElementById('fileInfo');
+
+            // Clear the table
+            fileInfoDiv.innerHTML = '';
+
+            // Nested table for digests
+            var digests = results.data.digests;
+            var digestsTable = '<table class="table" style="border-collapse: collapse;">';
+            for (var digest in digests) {
+                digestsTable += '<tr><td style="border-top: none; line-height: 1;">' + digests[digest].split(':')[0] + '</td><td style="border-top: none; line-height: 1;">' + digests[digest].split(':')[1] + '</td></tr>';
+            }
+            digestsTable += '</table>';
+
+            // Create table rows for file info
+            fileInfoDiv.innerHTML = '<tr><td>File Name</td><td>' + results.data.file_name + '</td></tr>';
+            fileInfoDiv.innerHTML += '<tr><td>File Size</td><td>' + results.data.file_size + '</td></tr>';
+            fileInfoDiv.innerHTML += '<tr><td style="text-align: center; vertical-align: middle;">Digests</td><td style="padding: 0px; margin: 0px;">' + digestsTable + '</td></tr>';
         }
+
 
         // Function to display scan results in table
         function displayResults(results) {
-            var table = document.getElementById('resultsTable');
-            // Clear existing rows
-            table.innerHTML = '';
-            // Add header row
-            var headerRow = table.insertRow();
-            headerRow.insertCell().innerHTML = "<b>File Name</b>";
-            headerRow.insertCell().innerHTML = "<b>Status</b>";
-            // Add scan result rows
-            results.forEach(function (result) {
-                var row = table.insertRow();
-                row.insertCell().innerText = result.name;
-                row.insertCell().innerText = result.status;
-            });
+            var resultsTable = document.getElementById('resultsTable');
+
+            // Clear the table
+            resultsTable.innerHTML = '';
+
+            var scanResults = results.data.scan_results;
+
+            // Create table header
+            resultsTable.innerHTML = '<tr><th>Machine</th><th>Result</th><th>Detected bad bytes</th></tr>';
+
+            // For each machine, display the machine name and result
+            for (var machine in scanResults) {
+                // If result is clean, display green, else display red
+                var resultColor = scanResults[machine].result === 'Undetected' ? 'green' : 'red';
+
+                // If badBytes are present, display them in a modal
+                var badBytes = scanResults[machine].badBytes ? '<button class="btn btn-secondary btn-sm" onclick="displayBadBytes(\'' + scanResults[machine].badBytes + '\')">View</button>' : 'N/A';
+
+                resultsTable.innerHTML += '<tr><td>' + machine + '</td><td style="color: ' + resultColor + ';">' + scanResults[machine].result + '</td><td>' + badBytes + '</td></tr>';
+            }
+        }
+
+        // Function to display badBytes in modal
+        function displayBadBytes(badBytes) {
+            var badBytesModal = document.getElementById('badBytesModal');
+            var badBytesContent = document.getElementById('badBytes');
+
+            // Decode the badBytes from base64
+            badBytes = atob(badBytes);
+
+            // Display the badBytes in the modal
+            badBytesContent.innerHTML = "<code>" + badBytes + "</code>";
+            badBytesModal.style.display = 'block';
+
+            // Close the modal when the user clicks on the 'x'
+            var span = document.getElementsByClassName('close')[0];
+            span.onclick = function () {
+                badBytesModal.style.display = 'none';
+            };
         }
 
         // Scan button click event
