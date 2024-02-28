@@ -66,7 +66,7 @@ The machines section is used to define the machines that MultScan will use for s
 
 - [ ] Dockerized
 - [x] Web UI
-- [ ] File Upload
+- [x] File Upload
 - File Info
   - [ ] Type
   - [ ] Hashing

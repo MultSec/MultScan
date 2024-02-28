@@ -1,6 +1,7 @@
 from flask import render_template, request, redirect, jsonify, send_file
 from app import app
 import time
+import os
 
 # favicon.ico route
 @app.route('/favicon.ico')
@@ -17,10 +18,10 @@ def index():
 @app.route('/api/v1/payload/upload', methods=['POST'])
 def upload():
     # Get the file from the request
-    file = request.files['file']
+    file = request.files['payload']
 
-    # Save the file
-    file.save('uploads/' + file.filename)
+    # Save the file to the uploads folder as payload
+    file.save('./uploads/payload')
 
     # Return the success message
     return jsonify({"message": "File uploaded successfully"})
@@ -32,7 +33,6 @@ def fileInfo():
 
     result = {
         "info": {
-            "name": "test.exe",
             "size": "14.5MB",
             "type": "PE32 executable (GUI) Intel 80386, for MS Windows",
             "entropy": "6.5",
@@ -70,7 +70,10 @@ def scan():
             }
         }
     }
-
+    
+    # Remove payload file from the uploads folder
+    os.remove('./uploads/payload')
+    
     return jsonify(result)
 
 # Route for errors

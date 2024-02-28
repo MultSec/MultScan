@@ -189,6 +189,26 @@
             document.getElementById('fileInput').files = event.dataTransfer.files;
         }
 
+        // Function to handle file upload
+        function uploadFile() {
+            // Get the file from the file input
+            var file = document.getElementById('fileInput').files[0];
+            // Create a FormData object
+            var formData = new FormData();
+            // Append the file to the FormData object
+            formData.append('payload', file);
+            // Send the file to the server
+            fetch('/api/v1/payload/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Log the response from the server
+                console.log(data);
+            })
+        }
+
         // Function to display badBytes in modal
         function displayBadBytes(badBytes) {
             var badBytesModal = document.getElementById('badBytesModal');
@@ -252,7 +272,6 @@
                 }
 
                 // Add the file information to the table
-                table.innerHTML += '<tr><td>File Name</td><td>' + data.info.name + '</td></tr>';
                 table.innerHTML += '<tr><td>File Size</td><td>' + data.info.size + '</td></tr>';
                 table.innerHTML += '<tr><td>File Type</td><td>' + data.info.type + '</td></tr>';
                 table.innerHTML += '<tr><td>Entropy</td><td>' + data.info.entropy + '</td></tr>';
@@ -319,7 +338,7 @@
         // Function to handle scanning
         function scan() {
             // Upload the file to the server
-            //uploadFile();
+            uploadFile();
 
             // Get file information
             getFileInfo();
