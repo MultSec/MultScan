@@ -256,20 +256,22 @@
                 table.innerHTML = '';
 
                 // Nested table for digests
+                var sha256 = "sha256"
                 var digests = data.info.digests;
                 var digestsTable = '<table class="table" style="border-collapse: collapse;">';
                 for (var digest in digests) {
                     digestsTable += '<tr><td style="border-top: none; line-height: 1;">' + digests[digest].split(':')[0] + '</td><td style="border-top: none; line-height: 1;">' + digests[digest].split(':')[1] + '</td></tr>';
+                    if (digests[digest].split(':')[0] == 'SHA-256') {
+                        sha256 = digests[digest].split(':')[1];
+                    }
                 }
                 digestsTable += '</table>';
 
                 // Nested table for public presence
-                var publicPresence = data.info.public_presence;
                 var publicPresenceTable = '<table class="table" style="border-collapse: collapse;">';
-                // Public presence is true show a checkmark, otherwise show a cross
-                for (var source in publicPresence) {
-                    publicPresenceTable += '<tr><td style="border-top: none; line-height: 1;">' + source + '</td><td style="border-top: none; line-height: 1;">' + (publicPresence[source] ? '✅' : '❌') + '</td></tr>';
-                }
+                publicPresenceTable += '<tr><td style="border-top: none; line-height: 1;">Virustotal</td><td style="border-top: none; line-height: 1;"><a href="https://www.virustotal.com/gui/search/' + sha256 + '/detection" target="_blank">View</a></td></tr>';
+                publicPresenceTable += '<tr><td style="border-top: none; line-height: 1;">IBM X-Force</td><td style="border-top: none; line-height: 1;"><a href="https://exchange.xforce.ibmcloud.com/malware/' + sha256 + '" target="_blank">View</a></td></tr>';
+
 
                 // Add the file information to the table
                 table.innerHTML += '<tr><td>File Size</td><td>' + data.info.size + '</td></tr>';

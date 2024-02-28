@@ -70,12 +70,12 @@ The machines section is used to define the machines that MultScan will use for s
 - File Info
   - [x] Type
   - Hashing
-    - [ ] MD5
-    - [ ] SHA-1
-    - [ ] SHA-256
+    - [x] MD5
+    - [x] SHA-1
+    - [x] SHA-256
   - Public Presence
-    - [ ] Check IBM X-Force
-    - [ ] Check Virustotal
+    - [x] Check IBM X-Force
+    - [x] Check Virustotal
 - [ ] REST API
 - Scanning
     - [ ] Modular Architecture
