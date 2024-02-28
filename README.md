@@ -68,9 +68,11 @@ The machines section is used to define the machines that MultScan will use for s
 - [x] Web UI
 - [x] File Upload
 - File Info
-  - [ ] Type
-  - [ ] Hashing
-  - [ ] Entropy
+  - [x] Type
+  - Hashing
+    - [ ] MD5
+    - [ ] SHA-1
+    - [ ] SHA-256
   - Public Presence
     - [ ] Check IBM X-Force
     - [ ] Check Virustotal

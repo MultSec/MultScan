@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, jsonify, send_file
 from app import app
 import time
-import os
+from utils.utils import getFileInfo
 
 # favicon.ico route
 @app.route('/favicon.ico')
@@ -20,8 +20,14 @@ def upload():
     # Get the file from the request
     file = request.files['payload']
 
+    # Write to semaphore config that the file is being uploaded
+    app.config['uploading'] = True
+
     # Save the file to the uploads folder as payload
     file.save('./uploads/payload')
+
+    # Write to semaphore config that the file has been uploaded
+    app.config['uploading'] = False
 
     # Return the success message
     return jsonify({"message": "File uploaded successfully"})
@@ -29,26 +35,11 @@ def upload():
 # Route for file information
 @app.route('/api/v1/payload/info', methods=['GET'])
 def fileInfo():
-    time.sleep(2)
-
-    result = {
-        "info": {
-            "size": "14.5MB",
-            "type": "PE32 executable (GUI) Intel 80386, for MS Windows",
-            "entropy": "6.5",
-            "digests": [
-                "MD5:6a46ba7a9cd4016294e6a713193c2642",
-                "SHA-1:12676b985e9d3a422252364195576f5f97b17cc2",
-                "SHA-256:78d348f7cefda75dd582a0412b408be8cedf200670e92de89ec442a93d0a1c46"
-            ],
-            "public_presence": {
-                "Virustotal" : True,
-                "IBM X-Force" : False,
-            }
-        }
-    }
-
-    return jsonify(result)
+    # Wait for the file to be uploaded
+    while app.config['uploading']:
+        pass
+        
+    return jsonify(getFileInfo())
 
 # Route for scan status
 @app.route('/api/v1/payload/scan', methods=['GET'])
@@ -70,9 +61,6 @@ def scan():
             }
         }
     }
-    
-    # Remove payload file from the uploads folder
-    os.remove('./uploads/payload')
     
     return jsonify(result)
 

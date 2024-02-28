@@ -145,8 +145,8 @@
             <br>
             <img src="static/loading.gif" style="width: 50px; height: 50px;">
         </div>
-        <! -- File Information Table -->
-        <table id="fileInfoTable" class="table" style="border-collapse: collapse; display: none;">
+        <!-- File Information Table -->
+        <table id="fileInfoTable" class="table" style="border-collapse: collapse; display: none; max-width: 100%; overflow-x: auto;">
         </table>
     </div>
 
@@ -158,7 +158,7 @@
             <img src="static/loading.gif" style="width: 50px; height: 50px;">
         </div>
         <!-- Scan Results Table -->
-        <table id="scanResultsTable" class="table" style="border-collapse: collapse; display: none;">
+        <table id="scanResultsTable" class="table" style="border-collapse: collapse; display: none; max-width: 100%; overflow-x: auto;">
         </table>
     </div>
 
@@ -274,7 +274,6 @@
                 // Add the file information to the table
                 table.innerHTML += '<tr><td>File Size</td><td>' + data.info.size + '</td></tr>';
                 table.innerHTML += '<tr><td>File Type</td><td>' + data.info.type + '</td></tr>';
-                table.innerHTML += '<tr><td>Entropy</td><td>' + data.info.entropy + '</td></tr>';
                 table.innerHTML += '<tr><td>Digests</td><td>' + digestsTable + '</td></tr>';
                 table.innerHTML += '<tr><td>Public Presence</td><td>' + publicPresenceTable + '</td></tr>';
 
