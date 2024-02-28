@@ -67,7 +67,13 @@ The machines section is used to define the machines that MultScan will use for s
 - [ ] Dockerized
 - [x] Web UI
 - [ ] File Upload
-- [ ] File Hashing
+- File Info
+  - [ ] Type
+  - [ ] Hashing
+  - [ ] Entropy
+  - Public Presence
+    - [ ] Check IBM X-Force
+    - [ ] Check Virustotal
 - [ ] REST API
 - Scanning
     - [ ] Modular Architecture
