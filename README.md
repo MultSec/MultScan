@@ -76,7 +76,7 @@ The machines section is used to define the machines that MultScan will use for s
   - Public Presence
     - [x] Check IBM X-Force
     - [x] Check Virustotal
-- [ ] REST API
+- [x] REST API
 - Scanning
     - [ ] Modular Architecture
     - [ ] Proxmox API
