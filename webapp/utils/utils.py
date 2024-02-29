@@ -84,7 +84,3 @@ def checkIIBMXForce(hash):
         return '❌'
     else:
         return '<a href="https://exchange.xforce.ibmcloud.com/malware/' + hash + '" target="_blank">✅</a>'
-
-def scan(payload):
-    # Print payload
-    print(payload)
