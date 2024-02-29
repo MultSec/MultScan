@@ -5,24 +5,6 @@ import time
 import os
 import requests
 
-{
-        "info": {
-            "name": "test.exe",
-            "size": "14.5MB",
-            "type": "PE32 executable (GUI) Intel 80386, for MS Windows",
-            "entropy": "6.5",
-            "digests": [
-                "MD5:6a46ba7a9cd4016294e6a713193c2642",
-                "SHA-1:12676b985e9d3a422252364195576f5f97b17cc2",
-                "SHA-256:78d348f7cefda75dd582a0412b408be8cedf200670e92de89ec442a93d0a1c46"
-            ],
-            "public_presence": {
-                "Virustotal" : True,
-                "IBM X-Force" : False,
-            }
-        }
-    }
-
 def getFileInfo():
     filename = './uploads/payload'
     # Create emptyt dictionary to store file info
@@ -47,15 +29,15 @@ def getFileInfo():
         fileInfo['info']['digests'].append("SHA-256:" + hashlib.sha256(data).hexdigest())
 
     # Public presence
+    digest = fileInfo['info']['digests'][2].split(':')[1]
     fileInfo['info']['public_presence'] = {}
-    fileInfo['info']['public_presence']['Virustotal'] = checkVirusTotal(fileInfo['info']['digests'][2].split(':')[1])
-    fileInfo['info']['public_presence']['IBM X-Force'] = '❌'
+    fileInfo['info']['public_presence']['Virustotal'] = checkVirusTotal(digest)
+    fileInfo['info']['public_presence']['IBM X-Force'] = checkIIBMXForce(digest)
 
     # Return fileInfo
     return fileInfo
 
 def checkVirusTotal(hash):
-    print(hash)
     headers = {
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0',
         'Accept': 'application/json',
@@ -76,11 +58,32 @@ def checkVirusTotal(hash):
     response = requests.get('https://www.virustotal.com/ui/files/' + hash, headers=headers)
 
     # Check for response {"error":{"code":"NotFoundError","message":"Resource not found."}} that indicates file not found in VirusTotal
-    print(response)
     if response.json().get('error'):
         return '❌'
     else:
-        return '<a href="https://www.virustotal.com/gui/search/' + hash + '/detection" target="_blank">✅</a>'
+        return '<a href="https://www.virustotal.com/gui/search/' + hash + '" target="_blank">✅</a>'
+
+def checkIIBMXForce(hash):
+    headers = {
+        "Host": "exchange.xforce.ibmcloud.com",
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Accept-Encoding": "gzip, deflate",
+        "X-Ui": "XFE",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-origin",
+        "Te": "trailers"
+    }
+
+    response = requests.get('https://exchange.xforce.ibmcloud.com/api/malware/' + hash, headers=headers)
+    
+    # Check for response
+    if response.json().get('error'):
+        return '❌'
+    else:
+        return '<a href="https://exchange.xforce.ibmcloud.com/malware/' + hash + '" target="_blank">✅</a>'
 
 def scan(payload):
     # Print payload
