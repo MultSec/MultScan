@@ -3,7 +3,25 @@ import magic
 import hashlib
 import time
 import os
-from requests_html import HTMLSession
+import requests
+
+{
+        "info": {
+            "name": "test.exe",
+            "size": "14.5MB",
+            "type": "PE32 executable (GUI) Intel 80386, for MS Windows",
+            "entropy": "6.5",
+            "digests": [
+                "MD5:6a46ba7a9cd4016294e6a713193c2642",
+                "SHA-1:12676b985e9d3a422252364195576f5f97b17cc2",
+                "SHA-256:78d348f7cefda75dd582a0412b408be8cedf200670e92de89ec442a93d0a1c46"
+            ],
+            "public_presence": {
+                "Virustotal" : True,
+                "IBM X-Force" : False,
+            }
+        }
+    }
 
 def getFileInfo():
     filename = './uploads/payload'
@@ -21,12 +39,48 @@ def getFileInfo():
 
     # Get digests
     fileInfo['info']['digests'] = []
-    fileInfo['info']['digests'].append("MD5:" + hashlib.md5(open(filename, 'rb').read()).hexdigest())
-    fileInfo['info']['digests'].append("SHA-1:" + hashlib.sha1(open(filename, 'rb').read()).hexdigest())
-    fileInfo['info']['digests'].append("SHA-256:" + hashlib.sha256(open(filename, 'rb').read()).hexdigest())
+    
+    with open(filename, 'rb') as f:
+        data = f.read()
+        fileInfo['info']['digests'].append("MD5:" + hashlib.md5(data).hexdigest())
+        fileInfo['info']['digests'].append("SHA-1:" + hashlib.sha1(data).hexdigest())
+        fileInfo['info']['digests'].append("SHA-256:" + hashlib.sha256(data).hexdigest())
+
+    # Public presence
+    fileInfo['info']['public_presence'] = {}
+    fileInfo['info']['public_presence']['Virustotal'] = checkVirusTotal(fileInfo['info']['digests'][2].split(':')[1])
+    fileInfo['info']['public_presence']['IBM X-Force'] = '❌'
 
     # Return fileInfo
     return fileInfo
+
+def checkVirusTotal(hash):
+    print(hash)
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0',
+        'Accept': 'application/json',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Accept-Encoding': 'gzip, deflate',
+        'Referer': 'https://www.virustotal.com/',
+        'Content-Type': 'application/json',
+        'X-Tool': 'vt-ui-main',
+        'X-App-Version': 'v1x249x0',
+        'Accept-Ianguage': 'en-US,en;q=0.9,es;q=0.8',
+        'X-Vt-Anti-Abuse-Header': 'a',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'same-origin',
+        'Te': 'trailers',
+    }
+
+    response = requests.get('https://www.virustotal.com/ui/files/' + hash, headers=headers)
+
+    # Check for response {"error":{"code":"NotFoundError","message":"Resource not found."}} that indicates file not found in VirusTotal
+    print(response)
+    if response.json().get('error'):
+        return '❌'
+    else:
+        return '<a href="https://www.virustotal.com/gui/search/' + hash + '/detection" target="_blank">✅</a>'
 
 def scan(payload):
     # Print payload
