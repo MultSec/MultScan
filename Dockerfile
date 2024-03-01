@@ -13,5 +13,5 @@ RUN pip3 install -r requirements.txt
 # Expose the port 8080
 EXPOSE 8080
 
-# Run the command to start uWSGI
-CMD ["uwsgi", "app.ini"]
+# Run the command to start server
+CMD ["python", "run.py"]

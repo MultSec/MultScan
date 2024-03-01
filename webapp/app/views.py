@@ -2,6 +2,11 @@ from flask import render_template, request, redirect, jsonify, send_file
 from app import app
 import time
 from utils.utils import getFileInfo
+from utils.get_conf import get_config
+
+with app.app_context():
+    app.config['uploading'] = False
+    app.config['scan_config'] = get_config()
 
 # favicon.ico route
 @app.route('/favicon.ico')

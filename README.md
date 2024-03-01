@@ -22,6 +22,7 @@ MultScan requires the usage of Docker, although it is possible to run it without
 git clone <repo>
 cd MultScan
 docker build -t multscan .
+docker run -p 80:8080 multscan
 ```
 
 ### Configuration
@@ -64,7 +65,7 @@ The machines section is used to define the machines that MultScan will use for s
 
 ### To-Do
 
-- [ ] Dockerized
+- [x] Dockerized
 - [x] Web UI
 - [x] File Upload
 - File Info
@@ -74,11 +75,9 @@ The machines section is used to define the machines that MultScan will use for s
     - [x] SHA-1
     - [x] SHA-256
   - Public Presence
-    - [x] Check IBM X-Force
     - [x] Check Virustotal
 - [x] REST API
 - Scanning
-    - [ ] Modular Architecture
     - [ ] Proxmox API
     - Static Analysis Trigger
         - [x] Binary Search

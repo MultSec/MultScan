@@ -32,7 +32,6 @@ def getFileInfo():
     digest = fileInfo['info']['digests'][2].split(':')[1]
     fileInfo['info']['public_presence'] = {}
     fileInfo['info']['public_presence']['Virustotal'] = checkVirusTotal(digest)
-    fileInfo['info']['public_presence']['IBM X-Force'] = checkIIBMXForce(digest)
 
     # Return fileInfo
     return fileInfo
@@ -62,25 +61,3 @@ def checkVirusTotal(hash):
         return '❌'
     else:
         return '<a href="https://www.virustotal.com/gui/search/' + hash + '" target="_blank">✅</a>'
-
-def checkIIBMXForce(hash):
-    headers = {
-        "Host": "exchange.xforce.ibmcloud.com",
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0",
-        "Accept": "application/json, text/plain, */*",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Accept-Encoding": "gzip, deflate",
-        "X-Ui": "XFE",
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "same-origin",
-        "Te": "trailers"
-    }
-
-    response = requests.get('https://exchange.xforce.ibmcloud.com/api/malware/' + hash, headers=headers)
-    
-    # Check for response
-    if response.json().get('error'):
-        return '❌'
-    else:
-        return '<a href="https://exchange.xforce.ibmcloud.com/malware/' + hash + '" target="_blank">✅</a>'
