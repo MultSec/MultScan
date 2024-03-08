@@ -269,7 +269,11 @@
                 var publicPresenceTable = '<table class="table" style="border-collapse: collapse;">';
                 // Public presence 
                 for (var presence in publicPresence) {
-                    publicPresenceTable += '<tr><td style="border-top: none; line-height: 1;">' + presence + '</td><td style="border-top: none; line-height: 1;">' + publicPresence[presence] + '</td></tr>';
+                    if (publicPresence[presence]){
+                        publicPresenceTable += '<tr><td style="border-top: none; line-height: 1;">' + presence + '</td><td style="border-top: none; line-height: 1;">✅</td></tr>';
+                    } else {
+                        publicPresenceTable += '<tr><td style="border-top: none; line-height: 1;">' + presence + '</td><td style="border-top: none; line-height: 1;">❌</td></tr>';
+                    }
                 }
 
                 // Add the file information to the table

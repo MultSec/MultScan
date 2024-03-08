@@ -57,7 +57,5 @@ def checkVirusTotal(hash):
     response = requests.get('https://www.virustotal.com/ui/files/' + hash, headers=headers)
 
     # Check for response {"error":{"code":"NotFoundError","message":"Resource not found."}} that indicates file not found in VirusTotal
-    if response.json().get('error'):
-        return '❌'
-    else:
-        return '<a href="https://www.virustotal.com/gui/search/' + hash + '" target="_blank">✅</a>'
+
+    return not response.json().get('error')
