@@ -1,12 +1,13 @@
 from flask import render_template, request, redirect, jsonify, send_file
 from app import app
 import time
-from utils.utils import getFileInfo, getConfig
+from utils.utils import getFileInfo, getConfig, getCleanResults, requestStatus
 
 # Gets configs and inits semaphore
 with app.app_context():
     app.config['uploading'] = False
     app.config['scan_config'] = getConfig()
+    app.config['scan_results'] = getCleanResults(app.config['scan_config'])
 
 # Route for favicon
 @app.route('/favicon.ico')
@@ -58,26 +59,18 @@ def scan():
     while app.config['uploading']:
         pass
     
+    # If scan status is "scanning"
+    if app.config['scan_results']['status'] == "scanning":
+        # Request the scan status
+        app.config['scan_results'] = requestStatus(app.config['scan_results'])
 
-    result = {
-        "status": "done",
-        "results": {
-            "Avast": {
-                "badBytes": "",
-                "result": "Undetected"
-            },
-            "Mcafee": {
-                "badBytes": "TWFsaWNpb3VzIGNvbnRlbnQgZm91bmQgYXQgb2Zmc2V0OiAwMDA0OGUzZAowMDAwMDAwMCAgNjUgNzQgNWYgNjEgNjQgNjQgNjkgNzQgIDY5IDZmIDZlIDYxIDZjIDVmIDc0IDY5ICB8ZXRfYWRkaXRpb25hbF90aXwKMDAwMDAwMTAgIDYzIDZiIDY1IDc0IDczIDAwIDY3IDY1ICA3NCA1ZiA3NCA2OSA2MyA2YiA2NSA3NCAgfGNrZXRzLmdldF90aWNrZXR8CjAwMDAwMDIwICA3MyAwMCA3MyA2NSA3NCA1ZiA3NCA2OSAgNjMgNmIgNjUgNzQgNzMgMDAgNTMgNzkgIHxzLnNldF90aWNrZXRzLlN5fAowMDAwMDAzMCAgNzMgNzQgNjUgNmQgMmUgNGUgNjUgNzQgIDJlIDUzIDZmIDYzIDZiIDY1IDc0IDczICB8c3RlbS5OZXQuU29ja2V0c3w=",
-                "result": "Detected"
-            },
-            "Dev01": {
-                "badBytes": "",
-                "result": "Detected"
-            }
-        }
-    }
-    
-    return jsonify(result)
+    # If scan status is "done"
+    else:
+        # Clear the scan results
+        app.config['scan_results'] = getCleanResults(app.config['scan_config'])
+
+    # Return the scan status
+    return jsonify(app.config['scan_results'])
 
 # Route for errors
 @app.errorhandler(404)

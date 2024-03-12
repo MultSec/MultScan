@@ -17,6 +17,15 @@ def getConfig():
     
     return cfg
 
+def getCleanResults(config):
+    results = {}
+    results['status'] = "scanning"
+    for machine in config['config']['machines']:
+        results[machine['machine_name']] = {}
+        results[machine['machine_name']]['badBytes'] = ""
+        results[machine['machine_name']]['result'] = ""
+    return results
+
 def getFileInfo():
     filename = './uploads/payload'
     # Create emptyt dictionary to store file info
@@ -71,3 +80,25 @@ def checkVirusTotal(hash):
     # Check for response {"error":{"code":"NotFoundError","message":"Resource not found."}} that indicates file not found in VirusTotal
 
     return not response.json().get('error')
+
+def requestStatus(status):
+
+    result = {
+        "status": "done",
+        "results": {
+            "Avast": {
+                "badBytes": "",
+                "result": "Undetected"
+            },
+            "Mcafee": {
+                "badBytes": "TWFsaWNpb3VzIGNvbnRlbnQgZm91bmQgYXQgb2Zmc2V0OiAwMDA0OGUzZAowMDAwMDAwMCAgNjUgNzQgNWYgNjEgNjQgNjQgNjkgNzQgIDY5IDZmIDZlIDYxIDZjIDVmIDc0IDY5ICB8ZXRfYWRkaXRpb25hbF90aXwKMDAwMDAwMTAgIDYzIDZiIDY1IDc0IDczIDAwIDY3IDY1ICA3NCA1ZiA3NCA2OSA2MyA2YiA2NSA3NCAgfGNrZXRzLmdldF90aWNrZXR8CjAwMDAwMDIwICA3MyAwMCA3MyA2NSA3NCA1ZiA3NCA2OSAgNjMgNmIgNjUgNzQgNzMgMDAgNTMgNzkgIHxzLnNldF90aWNrZXRzLlN5fAowMDAwMDAzMCAgNzMgNzQgNjUgNmQgMmUgNGUgNjUgNzQgIDJlIDUzIDZmIDYzIDZiIDY1IDc0IDczICB8c3RlbS5OZXQuU29ja2V0c3w=",
+                "result": "Detected"
+            },
+            "Dev01": {
+                "badBytes": "",
+                "result": "Detected"
+            }
+        }
+    }
+
+    return result

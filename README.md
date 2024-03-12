@@ -39,12 +39,8 @@ config:
   machines:
     - machine_name: "machine1"
       machine_ip: "10.10.10.10"
-      scan_timeout: 60
-      scan_bytes: false
     - machine_name: "machine2"
       machine_ip: "10.10.10.11"
-      scan_timeout: 60
-      scan_bytes: true
 ```
 
 #### Connector
@@ -60,8 +56,6 @@ The machines section is used to define the machines that MultScan will use for s
 
 - `machine_name`: The name of the machine.
 - `machine_ip`: The IP address of the machine.
-- `scan_timeout`: The timeout for the scan in seconds.
-- `scan_bytes`: Whether to scan the the bad bytes of the file with a scanner present on the machine.
 
 ### To-Do
 
@@ -79,8 +73,10 @@ The machines section is used to define the machines that MultScan will use for s
 - [x] REST API
 - Scanning
     - [ ] Proxmox API
-    - Static Analysis Trigger
-        - [x] Binary Search
-    - Dynamic Analysis Trigger
-        - [ ] On Execution
-        - [ ] On Finish
+    - Probe
+      - [ ] Coms
+      - Static Analysis Trigger
+          - [ ] Binary Search
+      - Dynamic Analysis Trigger
+          - [ ] On Execution
+          - [ ] On Finish
