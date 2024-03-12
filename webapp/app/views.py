@@ -1,25 +1,25 @@
 from flask import render_template, request, redirect, jsonify, send_file
 from app import app
 import time
-from utils.utils import getFileInfo
-from utils.get_conf import get_config
+from utils.utils import getFileInfo, getConfig
 
+# Gets configs and inits semaphore
 with app.app_context():
     app.config['uploading'] = False
-    app.config['scan_config'] = get_config()
+    app.config['scan_config'] = getConfig()
 
-# favicon.ico route
+# Route for favicon
 @app.route('/favicon.ico')
 def favicon():
     # Return the favicon
     return send_file('./static/MultScan.ico', mimetype='image/vnd.microsoft.icon')
 
-# Define the route that will serve the loader configuration
+# Route for the homepage
 @app.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
 
-# Define the route that handles file upload
+# Route for file upload
 @app.route('/api/v1/payload/upload', methods=['POST'])
 def upload():
     # Get the file from the request
@@ -46,9 +46,19 @@ def fileInfo():
         
     return jsonify(getFileInfo())
 
+# Route for payload download
+@app.route('/api/v1/payload/download', methods=['GET'])
+def download():
+    return send_file('../uploads/payload')
+
 # Route for scan status
 @app.route('/api/v1/payload/scan', methods=['GET'])
 def scan():
+    # Wait for the file to be uploaded
+    while app.config['uploading']:
+        pass
+    
+
     result = {
         "status": "done",
         "results": {
