@@ -178,7 +178,7 @@ func reqHandler(getBadBytes *bool, p *Payload) http.HandlerFunc {
 }
 
 func main() {
-	getBadBytes := flag.Bool("getBadBytes", false, "Get the bad bytes")
+	getBadBytes := flag.Bool("b", false, "Get the bad bytes")
 	flag.Parse()
 
 	// Create a new payload
