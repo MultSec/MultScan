@@ -3,7 +3,7 @@ import hashlib
 import os
 import requests
 
-def getFileInfo(filename):
+def fileInfo(filename):
     # Create emptyt dictionary to store file info
     fileInfo = {}
     fileInfo['info'] = {}

@@ -2,7 +2,7 @@ from flask import render_template, request, redirect, jsonify, send_file
 from app import app, Log
 import os
 import shutil
-from utils.utils import getFileInfo
+from utils.utils import fileInfo
 
 # Route for favicon
 @app.route('/favicon.ico')
@@ -46,7 +46,7 @@ def upload(id):
 # Retrieve fileinfo for a given id sample
 @app.route('/api/v1/sample/fileinfo/<id>', methods=['GET'])
 def getFileInfo(id):
-    return getFileInfo(f'./uploads/{id}/sample')
+    return fileInfo(f'./uploads/{id}/sample')
 
 # Request a scan status for a given id sample
 @app.route('/api/v1/sample/scan/<id>', methods=['GET'])
