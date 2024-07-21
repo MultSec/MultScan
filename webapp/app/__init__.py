@@ -1,12 +1,13 @@
 from flask import Flask
 import logging
 import flask.cli
+import sys
 
+# Disable logger to use our own
 flask.cli.show_server_banner = lambda *args: None
 
 log = logging.getLogger('werkzeug')
 log.disabled = True
-
 
 class Logger:
     @staticmethod

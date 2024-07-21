@@ -1,7 +1,28 @@
 import magic
 import hashlib
 import os
+import sys
 import requests
+import importlib
+from app import app, Log
+
+def turnOnMachines():
+    connectorPath = "connectors." + app.config['config']['connector']['connector_type']
+
+    Log.info("Turning On Machines")
+
+    importlib.import_module(connectorPath).turnOn()
+    
+def turnOffMachines():
+    # Clean line
+    sys.stdout.write('\r\033[K')
+    sys.stdout.flush()
+
+    connectorPath = "connectors." + app.config['config']['connector']['connector_type']
+
+    Log.info("Turning Off Machines")
+
+    importlib.import_module(connectorPath).turnOff()
 
 def fileInfo(filename):
     # Create emptyt dictionary to store file info
