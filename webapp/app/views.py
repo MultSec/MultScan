@@ -15,7 +15,7 @@ def favicon():
 def index():
     return render_template('index.html')
 
-# Get enabled plugins
+# Get present machines
 @app.route('/api/v1/machines', methods=['GET'])
 def machines():
     return app.config['config']['machines']

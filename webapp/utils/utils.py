@@ -112,7 +112,7 @@ def getSampleStatus(id):
                 "result": 'Scanning'
             }
 
-            status["status"][machine["name"]] = result
+            status["status"][machine["name"]] = {"badBytes": '', "result": 'Scanning'}
 
         # Write json to file
         with open(statusFilePath, 'w') as statusFile:
@@ -120,8 +120,9 @@ def getSampleStatus(id):
 
         # Request scan to agents
         Log.info(f"[\033[34m{id}\033[0m] Requesting sample scan")
-        # TODO
-
+        for machine in app.config['config']['machines']:
+            Log.subsection(f"[\033[34m{id}\033[0m] Requesting {machine['name']}({machine['ip']}) for scan")
+            # TODO
     else:
         # Check status on agents
         Log.info(f"[\033[34m{id}\033[0m] Checking sample scan status")
@@ -132,10 +133,12 @@ def getSampleStatus(id):
         
         # Update each machine status
         for machine in app.config['config']['machines']:
-            machine_name = machine["name"]
-            
+            Log.subsection(f"[\033[34m{id}\033[0m] Requesting {machine['name']}({machine['ip']}) for scan")
             # TODO: Add code to query machine for current status
+
+
             # Example mock update
+            machine_name = machine["name"]
             if machine_name == "machine1":
                 status["status"][machine_name]["badBytes"] = "MDAwNDhlM2QKMDAwMDAwMDAgIDY1IDc0IDVmIDYxIDY0IDY0IDY5IDc0ICA2OSA2ZiA2ZSA2MSA2YyA1ZiA3NCA2OSAgfGV0X2FkZGl0aW9uYWxfdGl8CjAwMDAwMDEwICA2MyA2YiA2NSA3NCA3MyAwMCA2NyA2NSAgNzQgNWYgNzQgNjkgNjMgNmIgNjUgNzQgIHxja2V0cy5nZXRfdGlja2V0fAowMDAwMDAyMCAgNzMgMDAgNzMgNjUgNzQgNWYgNzQgNjkgIDYzIDZiIDY1IDc0IDczIDAwIDUzIDc5ICB8cy5zZXRfdGlja2V0cy5TeXwKMDAwMDAwMzAgIDczIDc0IDY1IDZkIDJlIDRlIDY1IDc0ICAyZSA1MyA2ZiA2MyA2YiA2NSA3NCA3MyAgfHN0ZW0uTmV0LlNvY2tldHN8"
                 status["status"][machine_name]["result"] = "Detected"
