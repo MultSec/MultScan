@@ -2,7 +2,7 @@ from flask import render_template, request, redirect, jsonify, send_file
 from app import app, Log
 import os
 import shutil
-from utils.utils import fileInfo
+from utils.utils import fileInfo, getSampleStatus
 
 # Route for favicon
 @app.route('/favicon.ico')
@@ -51,61 +51,7 @@ def getFileInfo(id):
 # Request a scan status for a given id sample
 @app.route('/api/v1/sample/scan/<id>', methods=['GET'])
 def getStatus(id):
-    statusFilePath = f'./uploads/{id}/sample/status'
-
-    # Check if status file exists
-    if not os.path.exists(statusFilePath):
-        # Create status file
-        Log.info(f"[\033[34m{id}\033[0m] Creating status file")
-
-        status = {"status": {}}
-
-        for machine in app.config['config']['machines']:
-            result = {
-                "badBytes": '',
-                "result": 'Scanning'
-            }
-
-            status["status"][machine["name"]] = result
-
-        # Write json to file
-        with open(statusFilePath, 'w') as statusFile:
-            json.dump(status, statusFile, indent=4)
-
-        # Request scan to agents
-        Log.info(f"[\033[34m{id}\033[0m] Requesting sample scan")
-        # TODO
-
-    else:
-        # Check status on agents
-        Log.info(f"[\033[34m{id}\033[0m] Checking sample scan status")
-
-        # Load existing status
-        with open(statusFilePath, 'r') as statusFile:
-            status = json.load(statusFile)
-        
-        # Update each machine status
-        for machine in app.config['config']['machines']:
-            machine_name = machine["name"]
-            
-            # TODO: Add code to query machine for current status
-            # Example mock update
-            if machine_name == "machine1":
-                status["status"][machine_name]["badBytes"] = "TWFsaWNpb3VzIGNvbnRlbnQgZm91bmQgYXQgb2Zmc2V0OiAwMDA0OGUzZAowMDAwMDAwMCAgNjUgNzQgNWYgNjEgNjQgNjQgNjkgNzQgIDY5IDZmIDZlIDYxIDZjIDVmIDc0IDY5ICB8ZXRfYWRkaXRpb25hbF90aXwKMDAwMDAwMTAgIDYzIDZiIDY1IDc0IDczIDAwIDY3IDY1ICA3NCA1ZiA3NCA2OSA2MyA2YiA2NSA3NCAgfGNrZXRzLmdldF90aWNrZXR8CjAwMDAwMDIwICA3MyAwMCA3MyA2NSA3NCA1ZiA3NCA2OSAgNjMgNmIgNjUgNzQgNzMgMDAgNTMgNzkgIHxzLnNldF90aWNrZXRzLlN5fAowMDAwMDAzMCAgNzMgNzQgNjUgNmQgMmUgNGUgNjUgNzQgIDJlIDUzIDZmIDYzIDZiIDY1IDc0IDczICB8c3RlbS5OZXQuU29ja2V0c3w="
-                status["status"][machine_name]["result"] = "Detected"
-            else:
-                status["status"][machine_name]["result"] = "Undetected"
-
-        # Update status file
-        with open(statusFilePath, 'w') as statusFile:
-            json.dump(status, statusFile, indent=4)
-
-    # Load status file
-    with open(statusFilePath, 'r') as statusFile:
-        status = json.load(statusFile)
-
-    # Return status
-    return jsonify(status)
+    return jsonify(getSampleStatus(id))
 
 @app.route('/api/v1/sample/delete/<id>', methods=['GET'])
 def deleteSample(id):

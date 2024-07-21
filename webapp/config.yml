@@ -1,11 +1,11 @@
 config:
   connector:
-    connector_type: "proxmox"
-    connector_url: "https://proxmox.example.com:8006/api2/json"
-    connector_user: "root@pam"
-    connector_password: "password"
+    type: "proxmox"
+    url: "https://proxmox.example.com:8006/api2/json"
+    user: "root@pam"
+    password: "password"
   machines:
-    - machine_name: "machine1"
-      machine_ip: "10.10.10.10"
-    - machine_name: "machine2"
-      machine_ip: "10.10.10.11"
+    - name: "machine1"
+      ip: "10.10.10.10"
+    - name: "machine2"
+      ip: "10.10.10.11"

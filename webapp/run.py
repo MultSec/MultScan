@@ -1,7 +1,7 @@
 from app import app, Log
 from utils.retrieve_config import getConfig
 import json
-from utils.utils import turnOnMachines, turnOffMachines
+from utils.utils import turnOnMachines, turnOffMachines, cleanUploads
 
 if __name__ == "__main__":
     app.config['config'] = getConfig()
@@ -13,5 +13,6 @@ if __name__ == "__main__":
         Log.error(f"An error occurred: {str(e)}")
     finally:
         turnOffMachines()
+        cleanUploads()
         Log.info("Shutting down server")
 

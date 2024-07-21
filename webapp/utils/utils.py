@@ -2,27 +2,45 @@ import magic
 import hashlib
 import os
 import sys
+import json
 import requests
 import importlib
+import shutil
 from app import app, Log
 
 def turnOnMachines():
-    connectorPath = "connectors." + app.config['config']['connector']['connector_type']
+    connectorPath = "connectors." + app.config['config']['connector']['type']
 
     Log.info("Turning On Machines")
 
     importlib.import_module(connectorPath).turnOn()
-    
+
 def turnOffMachines():
     # Clean line
     sys.stdout.write('\r\033[K')
     sys.stdout.flush()
 
-    connectorPath = "connectors." + app.config['config']['connector']['connector_type']
+    connectorPath = "connectors." + app.config['config']['connector']['type']
 
     Log.info("Turning Off Machines")
 
     importlib.import_module(connectorPath).turnOff()
+
+def cleanUploads():
+    Log.info("Cleaning Up uploads storage")
+
+    parent_dir = './uploads'
+
+    # Iterate over all items in the parent directory
+    for item in os.listdir(parent_dir):
+        item_path = os.path.join(parent_dir, item)
+        # Check if the item is a directory
+        if os.path.isdir(item_path):
+            try:
+                # Remove the directory and all its contents
+                shutil.rmtree(item_path)
+            except Exception as e:
+                Log.error(f"Error removing {item_path}: {e}")
 
 def fileInfo(filename):
     # Create emptyt dictionary to store file info
@@ -77,3 +95,60 @@ def checkVirusTotal(hash):
     # Check for response {"error":{"code":"NotFoundError","message":"Resource not found."}} that indicates file not found in VirusTotal
 
     return not response.json().get('error')
+
+def getSampleStatus(id):
+    statusFilePath = f'./uploads/{id}/status'
+
+    # Check if status file exists
+    if not os.path.exists(statusFilePath):
+        # Create status file
+        Log.info(f"[\033[34m{id}\033[0m] Creating status file")
+
+        status = {"status": {}}
+
+        for machine in app.config['config']['machines']:
+            result = {
+                "badBytes": '',
+                "result": 'Scanning'
+            }
+
+            status["status"][machine["name"]] = result
+
+        # Write json to file
+        with open(statusFilePath, 'w') as statusFile:
+            json.dump(status, statusFile, indent=4)
+
+        # Request scan to agents
+        Log.info(f"[\033[34m{id}\033[0m] Requesting sample scan")
+        # TODO
+
+    else:
+        # Check status on agents
+        Log.info(f"[\033[34m{id}\033[0m] Checking sample scan status")
+
+        # Load existing status
+        with open(statusFilePath, 'r') as statusFile:
+            status = json.load(statusFile)
+        
+        # Update each machine status
+        for machine in app.config['config']['machines']:
+            machine_name = machine["name"]
+            
+            # TODO: Add code to query machine for current status
+            # Example mock update
+            if machine_name == "machine1":
+                status["status"][machine_name]["badBytes"] = "MDAwNDhlM2QKMDAwMDAwMDAgIDY1IDc0IDVmIDYxIDY0IDY0IDY5IDc0ICA2OSA2ZiA2ZSA2MSA2YyA1ZiA3NCA2OSAgfGV0X2FkZGl0aW9uYWxfdGl8CjAwMDAwMDEwICA2MyA2YiA2NSA3NCA3MyAwMCA2NyA2NSAgNzQgNWYgNzQgNjkgNjMgNmIgNjUgNzQgIHxja2V0cy5nZXRfdGlja2V0fAowMDAwMDAyMCAgNzMgMDAgNzMgNjUgNzQgNWYgNzQgNjkgIDYzIDZiIDY1IDc0IDczIDAwIDUzIDc5ICB8cy5zZXRfdGlja2V0cy5TeXwKMDAwMDAwMzAgIDczIDc0IDY1IDZkIDJlIDRlIDY1IDc0ICAyZSA1MyA2ZiA2MyA2YiA2NSA3NCA3MyAgfHN0ZW0uTmV0LlNvY2tldHN8"
+                status["status"][machine_name]["result"] = "Detected"
+            else:
+                status["status"][machine_name]["result"] = "Undetected"
+
+        # Update status file
+        with open(statusFilePath, 'w') as statusFile:
+            json.dump(status, statusFile, indent=4)
+
+    # Load status file
+    with open(statusFilePath, 'r') as statusFile:
+        status = json.load(statusFile)
+
+    # Return status
+    return status
