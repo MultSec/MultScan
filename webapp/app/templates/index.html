@@ -1,306 +1,284 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>MultScan</title>
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css">
-    <!-- Styling -->
-    <style>
-        * {
-            font-size: large;
-            font-family: monospace;
-        }
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>MultScan</title>
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css">
+        <!-- Styling -->
+        <style>
+            * {
+                font-size: large;
+                font-family: monospace;
+            }
 
-        :root {
-            --black: #000000;
-            --white: #ffffff;
-        }
-
-        body {
-            max-width: 45%;
-            margin: auto;
-            color: var(--black);
-            background-color: var(--white);
-        }
-
-        h1 {
-            color: var(--black);
-            border-bottom: 1px dashed var(--black);
-        }
-
-        h2 {
-            margin-top: 10px;
-            margin-bottom: 5px;
-            padding-top: 50px;
-            border-top: 1px dashed var(--black);
-            border-bottom: 1px dashed var(--black);
-        }
-
-        h1, h2 {
-            font-size: 24px;
-        }
-
-        p {
-            color: var(--black);
-            font-size: 13px;
-        }
-
-        textarea {
-            width: 95%;
-        }
-
-        a {
-            font-weight: lighter;
-            font-size: large;
-            color: var(--black);
-            text-decoration: none;
-        }
-
-        a:hover,
-        a:active {
-            color: var(--black);
-            text-decoration: underline;
-        }
-
-        .desc {
-            margin-top: 0px;
-            margin-bottom: 0px;
-        }
-
-        @media all and (orientation:landscape) {
-            html {
-                background-color: var(--white);
+            :root {
+                --black: #000000;
+                --white: #ffffff;
             }
 
             body {
-                padding: 2%;
+                max-width: 45%;
+                margin: auto;
+                color: var(--black);
                 background-color: var(--white);
-                box-shadow: 25px 20px 1px var(--white);
-                border-radius: 2px;
-                border: 1px solid white;
             }
 
             h1 {
-                text-align: center;
-                text-shadow: 4px 4px 2px var(--white);
-                padding: 0;
+                color: var(--black);
+                border-bottom: 1px dashed var(--black);
             }
-        }       
-        
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 9999;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #ffffff;
-            width: 200px;
-            height: 200px;
-            border-radius: 10px;
-            padding: 20px;
-            color: var(--black);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-        }
 
-        @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-    </style>
-</head>
+            h2 {
+                margin-top: 10px;
+                margin-bottom: 5px;
+                padding-top: 50px;
+                border-top: 1px dashed var(--black);
+                border-bottom: 1px dashed var(--black);
+            }
 
-<body>
-    <h1>MultScan</h1>
-    <!-- Align image to center-->
-    <p style="text-align: center;">
-        <img width="125px" src="static/MultScan.png" />
-    </p>
-    <p>
-        <i>MultScan is a self-hosted malware scanner, created by <a href="https://infosec.exchange/@Pengrey">@Pengrey</a>. </i>
-    </p>
-    <form id="uploadForm" enctype="multipart/form-data">
-        <!-- File Upload -->
-        <div class="files" id="files">
-            <div class="border p-3 mb-3" id="dropArea" ondrop="handleDrop(event)" ondragover="handleDragOver(event)">
-                <!-- Placeholder for the dropped or chosen file -->
-                <p style="text-align: center;">Drag and drop a bin file here <br> or<br>
-                    <input type="file" id="fileInput" name="payload">
-                </p>
+            h1, h2 {
+                font-size: 24px;
+            }
+
+            p {
+                color: var(--black);
+                font-size: 13px;
+            }
+
+            textarea {
+                width: 95%;
+            }
+
+            a {
+                font-weight: lighter;
+                font-size: large;
+                color: var(--black);
+                text-decoration: none;
+            }
+
+            a:hover,
+            a:active {
+                color: var(--black);
+                text-decoration: underline;
+            }
+
+            .desc {
+                margin-top: 0px;
+                margin-bottom: 0px;
+            }
+
+            @media all and (orientation:landscape) {
+                html {
+                    background-color: var(--white);
+                }
+
+                body {
+                    padding: 2%;
+                    background-color: var(--white);
+                    box-shadow: 25px 20px 1px var(--white);
+                    border-radius: 2px;
+                    border: 1px solid white;
+                }
+
+                h1 {
+                    text-align: center;
+                    text-shadow: 4px 4px 2px var(--white);
+                    padding: 0;
+                }
+            }       
+            
+            /* Modal */
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 9999;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                background-color: #ffffff;
+                width: 200px;
+                height: 200px;
+                border-radius: 10px;
+                padding: 20px;
+                color: var(--black);
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            }
+
+            @keyframes spin {
+                0% { transform: translate(-50%, -50%) rotate(0deg); }
+                100% { transform: translate(-50%, -50%) rotate(360deg); }
+            }
+        </style>
+    </head>
+
+    <body>
+        <h1>MultScan</h1>
+        <!-- Align image to center-->
+        <p style="text-align: center;">
+            <img width="125px" src="static/MultScan.png" />
+        </p>
+        <p>
+            <i>MultScan is a self-hosted malware scanner, created by <a href="https://infosec.exchange/@Pengrey">@Pengrey</a>. </i>
+        </p>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <!-- File Upload -->
+            <div class="files" id="files">
+                <div class="border p-3 mb-3" id="dropArea" ondrop="handleDrop(event)" ondragover="handleDragOver(event)">
+                    <!-- Placeholder for the dropped or chosen file -->
+                    <p style="text-align: center;">Drag and drop a bin file here <br> or<br>
+                        <input type="file" id="fileInput" name="payload">
+                    </p>
+                </div>
+            </div>
+        </form>
+        <div>
+            <br />
+            <button id="scanButton" class="btn btn-secondary btn-lg btn-block" style="margin-left: 5px;" onclick="scan()">Scan</button>
+        </div>
+
+        <!-- File Information -->
+        <div id="fileInfo" style="display: none;">
+            <h2>File Information</h2>
+            <!-- Loading Spinner -->
+            <div id="fileInfoLoadingSpinner" style="display: none; text-align: center;">
+                <br>
+                <img src="static/loading.gif" style="width: 50px; height: 50px;">
+            </div>
+            <!-- File Information Table -->
+            <table id="fileInfoTable" class="table" style="border-collapse: collapse; display: none; max-width: 100%; overflow-x: auto;">
+            </table>
+        </div>
+
+        <!-- Scan Results -->
+        <div id="scanResults" style="display: none;">
+            <h2>Scan Results</h2>
+            <!-- Loading Spinner -->
+            <div id="scanResultsLoadingSpinner" style="display: none; text-align: center;">
+                <img src="static/loading.gif" style="width: 50px; height: 50px;">
+            </div>
+            <!-- Scan Results Table -->
+            <table id="scanResultsTable" class="table" style="border-collapse: collapse; display: none; max-width: 100%; overflow-x: auto;">
+            </table>
+        </div>
+
+        <!-- BadBytes Modal -->
+        <div id="badBytesModal" class="modal" style="width: 45%; height: 45%;">
+            <span class="close">&times;</span>
+            <h1>Hexdump of detected bad bytes</h1>
+            <!-- Center the div inside the modal -->
+            <div style="background-color: #f2f2f2; padding: 20px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <pre id="badBytes" style="overflow: auto;"></pre>
             </div>
         </div>
-    </form>
-    <div>
-        <br />
-        <button id="scanButton" class="btn btn-secondary btn-lg btn-block" style="margin-left: 5px;" onclick="scan()">Scan</button>
-    </div>
-
-    <!-- File Information -->
-    <div id="fileInfo" style="display: none;">
-        <h2>File Information</h2>
-        <!-- Loading Spinner -->
-        <div id="fileInfoLoadingSpinner" style="display: none; text-align: center;">
-            <br>
-            <img src="static/loading.gif" style="width: 50px; height: 50px;">
-        </div>
-        <!-- File Information Table -->
-        <table id="fileInfoTable" class="table" style="border-collapse: collapse; display: none; max-width: 100%; overflow-x: auto;">
-        </table>
-    </div>
-
-    <!-- Scan Results -->
-    <div id="scanResults" style="display: none;">
-        <h2>Scan Results</h2>
-        <!-- Loading Spinner -->
-        <div id="scanResultsLoadingSpinner" style="display: none; text-align: center;">
-            <img src="static/loading.gif" style="width: 50px; height: 50px;">
-        </div>
-        <!-- Scan Results Table -->
-        <table id="scanResultsTable" class="table" style="border-collapse: collapse; display: none; max-width: 100%; overflow-x: auto;">
-        </table>
-    </div>
-
-    <!-- BadBytes Modal -->
-    <div id="badBytesModal" class="modal" style="width: 45%; height: 45%;">
-        <span class="close">&times;</span>
-        <h1>Hexdump of detected bad bytes</h1>
-        <!-- Center the div inside the modal -->
-        <div style="background-color: #f2f2f2; padding: 20px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-            <pre id="badBytes" style="overflow: auto;"></pre>
-        </div>
-    </div>
 
 
-    <script>
-        // Function to handle drag and drop events
-        function handleDragOver(event) {
-            event.preventDefault();
-            event.dataTransfer.dropEffect = 'copy';
-        }
+        <script>
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
 
-        // Function to handle the dropped file
-        function handleDrop(event) {
-            event.preventDefault();
-            // Get the file from the event
-            var file = event.dataTransfer.files[0];
-            // Set the file input to the file
-            document.getElementById('fileInput').files = event.dataTransfer.files;
-        }
+            // Function to handle drag and drop events
+            function handleDragOver(event) {
+                event.preventDefault();
+                event.dataTransfer.dropEffect = 'copy';
+            }
 
-        // Function to handle file upload
-        function uploadFile() {
-            // Get the file from the file input
-            var file = document.getElementById('fileInput').files[0];
-            // Create a FormData object
-            var formData = new FormData();
-            // Append the file to the FormData object
-            formData.append('payload', file);
-            // Send the file to the server
-            fetch('/api/v1/payload/upload', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Log the response from the server
-                console.log(data);
-            })
-        }
+            // Function to handle the dropped file
+            function handleDrop(event) {
+                event.preventDefault();
+                // Get the file from the event
+                var file = event.dataTransfer.files[0];
+                // Set the file input to the file
+                document.getElementById('fileInput').files = event.dataTransfer.files;
+            }
 
-        // Function to display badBytes in modal
-        function displayBadBytes(badBytes) {
-            var badBytesModal = document.getElementById('badBytesModal');
-            var badBytesContent = document.getElementById('badBytes');
+            // Function to handle file upload
+            function uploadFile(id) {
+                // Get the file from the file input
+                var file = document.getElementById('fileInput').files[0];
 
-            // Decode the badBytes from base64
-            badBytes = atob(badBytes);
+                // Create a FormData object
+                var formData = new FormData();
 
-            // Display the badBytes in the modal
-            badBytesContent.innerHTML = "<code>" + badBytes + "</code>";
-            badBytesModal.style.display = 'block';
+                // Append the file to the FormData object
+                formData.append('sample', file);
 
-            // Close the modal when the user clicks on the 'x'
-            var span = document.getElementsByClassName('close')[0];
-            span.onclick = function () {
-                badBytesModal.style.display = 'none';
-            };
-        }
+                // Send the file to the server
+                fetch('/api/v1/sample/upload/' + id, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Log the response from the server
+                    console.log(data);
+                })
+            }
 
-        // Retrieve file information from the server
-        function getFileInfo() {
-            // Show the file information section
-            document.getElementById('fileInfo').style.display = 'block';
+            function generateID() {
+                // Generate a random 256 bit number (32 bytes)
+                let randomBytes = new Uint8Array(32);
+                crypto.getRandomValues(randomBytes);
 
-            // Hide the file information table
-            document.getElementById('fileInfoTable').style.display = 'none';
+                // Convert the random bytes to a Base64 encoded string
+                let base64EncodedDigest = btoa(String.fromCharCode(...randomBytes));
 
-            // Show the loading spinner
-            document.getElementById('fileInfoLoadingSpinner').style.display = 'block';
+                // Replace special characters with URL-safe characters
+                base64EncodedDigest = base64EncodedDigest
+                    .replace(/\+/g, '-')
+                    .replace(/\//g, '_')
+                    .replace(/=+$/, ''); // Remove any trailing '=' characters
 
-            // Retrieve file information from the endpoint /api/v1/payload/info
-            fetch('/api/v1/payload/info', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
+                // Return the generated ID
+                return base64EncodedDigest;
+            }
+
+            function isFileInputEmpty() {
+                let fileInput = document.getElementById('fileInput');
+                
+                // Check if fileInput exists and if files[0] is empty
+                if (fileInput && fileInput.files && fileInput.files.length > 0) {
+                    // Files have been selected
+                    return false;
+                } else {
+                    // No file selected
+                    return true;
                 }
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Hide the loading spinner
-                document.getElementById('fileInfoLoadingSpinner').style.display = 'none';
+            }
 
-                // Clear the table
-                var table = document.getElementById('fileInfoTable');
-                table.innerHTML = '';
+            // Function to display badBytes in modal
+            function displayBadBytes(badBytes) {
+                var badBytesModal = document.getElementById('badBytesModal');
+                var badBytesContent = document.getElementById('badBytes');
 
-                // Nested table for digests
-                var sha256 = "sha256"
-                var digests = data.info.digests;
-                var digestsTable = '<table class="table" style="border-collapse: collapse;">';
-                for (var digest in digests) {
-                    digestsTable += '<tr><td style="border-top: none; line-height: 1;">' + digests[digest].split(':')[0] + '</td><td style="border-top: none; line-height: 1;">' + digests[digest].split(':')[1] + '</td></tr>';
-                }
-                digestsTable += '</table>';
+                // Decode the badBytes from base64
+                badBytes = atob(badBytes);
 
-                // Nested table for public presence
-                var publicPresence = data.info.public_presence;
-                var publicPresenceTable = '<table class="table" style="border-collapse: collapse;">';
-                // Public presence 
-                for (var presence in publicPresence) {
-                    if (publicPresence[presence]){
-                        publicPresenceTable += '<tr><td style="border-top: none; line-height: 1;">' + presence + '</td><td style="border-top: none; line-height: 1;">✅</td></tr>';
-                    } else {
-                        publicPresenceTable += '<tr><td style="border-top: none; line-height: 1;">' + presence + '</td><td style="border-top: none; line-height: 1;">❌</td></tr>';
-                    }
-                }
+                // Display the badBytes in the modal
+                badBytesContent.innerHTML = "<code>Malicious content found at offset: " + badBytes + "</code>";
+                badBytesModal.style.display = 'block';
 
-                // Add the file information to the table
-                table.innerHTML += '<tr><td>File Size</td><td>' + data.info.size + '</td></tr>';
-                table.innerHTML += '<tr><td>File Type</td><td>' + data.info.type + '</td></tr>';
-                table.innerHTML += '<tr><td>Digests</td><td>' + digestsTable + '</td></tr>';
-                table.innerHTML += '<tr><td>Public Presence</td><td>' + publicPresenceTable + '</td></tr>';
+                // Close the modal when the user clicks on the 'x'
+                var span = document.getElementsByClassName('close')[0];
+                span.onclick = function () {
+                    badBytesModal.style.display = 'none';
+                };
+            }
 
-                // Show the file information table
-                table.style.display = 'table';
-            })
-        }
+            // Retrieve file information from the server
+            function getFileInfo(id) {
+                // Show the file information section
+                document.getElementById('fileInfo').style.display = 'block';
 
-        // Retrieve scan results from the server
-        function getScanResults() {
-            // Show the scan results section
-            document.getElementById('scanResults').style.display = 'block';
+                // Hide the file information table
+                document.getElementById('fileInfoTable').style.display = 'none';
 
-            // Hide the results table
-            document.getElementById('scanResultsTable').style.display = 'none';
+                // Show the loading spinner
+                document.getElementById('fileInfoLoadingSpinner').style.display = 'block';
 
-            // Show the loading spinner
-            document.getElementById('scanResultsLoadingSpinner').style.display = 'block';
-
-            // Retrieve scan results from the endpoint /api/v1/payload/scan by querying the server every 5 seconds and checking if status is different from "scanning"
-            var interval = setInterval(function() {
-                fetch('/api/v1/payload/scan', {
+                // Retrieve file information from the endpoint /api/v1/payload/info
+                fetch('/api/v1/sample/fileinfo/' + id, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -308,52 +286,137 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    // If the scan is complete
-                    if (data.status != 'scanning') {
-                        // Hide the loading spinner
-                        document.getElementById('scanResultsLoadingSpinner').style.display = 'none';
+                    // Hide the loading spinner
+                    document.getElementById('fileInfoLoadingSpinner').style.display = 'none';
 
-                        // Clear the table
-                        var table = document.getElementById('scanResultsTable');
-                        table.innerHTML = '';
+                    // Clear the table
+                    var table = document.getElementById('fileInfoTable');
+                    table.innerHTML = '';
 
-                        // Add Headers to the table
-                        table.innerHTML += '<tr><th>Machine Name</th><th>Result</th><th>Bad Bytes</th></tr>';
-
-                        // Add the scan results to the table
-                        for (var result in data.results) {
-                            // If result is undetected, show green, otherwise show red
-                            var resultColor = data.results[result].result == 'Undetected' ? 'green' : 'red';
-
-                            // If badBytes are present, display them in a modal
-                            var badBytes = data.results[result].badBytes ? '<button class="btn btn-secondary btn-sm" onclick="displayBadBytes(\'' + data.results[result].badBytes + '\')">View</button>' : 'N/A';
-
-                            table.innerHTML += '<tr><td>' + result + '</td><td style="color: ' + resultColor + ';">' + data.results[result].result + '</td><td>' + badBytes + '</td></tr>';
-                        }
-
-                        // Show the scan results table
-                        table.style.display = 'table';
-
-                        // Stop querying the server
-                        clearInterval(interval);
+                    // Nested table for digests
+                    var digests = data.info.digests;
+                    var digestsTable = '<table class="table" style="border-collapse: collapse;">';
+                    for (var digest in digests) {
+                        digestsTable += '<tr><td style="border-top: none; line-height: 1;">' + digests[digest].split(':')[0] + '</td><td style="border-top: none; line-height: 1;">' + digests[digest].split(':')[1] + '</td></tr>';
                     }
+                    digestsTable += '</table>';
+
+                    // Nested table for public presence
+                    var publicPresence = data.info.public_presence;
+                    var publicPresenceTable = '<table class="table" style="border-collapse: collapse;">';
+                    // Public presence 
+                    for (var presence in publicPresence) {
+                        if (publicPresence[presence]){
+                            publicPresenceTable += '<tr><td style="border-top: none; line-height: 1;">' + presence + '</td><td style="border-top: none; line-height: 1;">✅</td></tr>';
+                        } else {
+                            publicPresenceTable += '<tr><td style="border-top: none; line-height: 1;">' + presence + '</td><td style="border-top: none; line-height: 1;">❌</td></tr>';
+                        }
+                    }
+
+                    // Add the file information to the table
+                    table.innerHTML += '<tr><td>File Size</td><td>' + data.info.size + '</td></tr>';
+                    table.innerHTML += '<tr><td>File Type</td><td>' + data.info.type + '</td></tr>';
+                    table.innerHTML += '<tr><td>Digests</td><td>' + digestsTable + '</td></tr>';
+                    table.innerHTML += '<tr><td>Public Presence</td><td>' + publicPresenceTable + '</td></tr>';
+
+                    // Show the file information table
+                    table.style.display = 'table';
                 })
-            }, 5000);
+            }
 
-        }
+            // Retrieve scan results from the server
+            function getScanResults(id) {
+                // Show the scan results section
+                document.getElementById('scanResults').style.display = 'block';
 
-        // Function to handle scanning
-        function scan() {
-            // Upload the file to the server
-            uploadFile();
+                // Hide the results table
+                document.getElementById('scanResultsTable').style.display = 'none';
 
-            // Get file information
-            getFileInfo();
+                // Show the loading spinner
+                document.getElementById('scanResultsLoadingSpinner').style.display = 'block';
 
-            // Get scan results
-            getScanResults();
-        }
+                // Retrieve scan results from the endpoint /api/v1/payload/scan by querying the server every 5 seconds and checking if status is different from "scanning"
+                var interval = setInterval(function() {
+                    fetch('/api/v1/sample/scan/' + id, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // If the scan is complete
+                        if (Object.values(data.status).every(machine => machine.result !== "Scanning")) {
+                            // Hide the loading spinner
+                            document.getElementById('scanResultsLoadingSpinner').style.display = 'none';
 
-    </script>
-</body>
+                            // Clear the table
+                            var table = document.getElementById('scanResultsTable');
+                            table.innerHTML = '';
+
+                            // Add Headers to the table
+                            table.innerHTML += '<tr><th>Machine Name</th><th>Result</th><th>Bad Bytes</th></tr>';
+
+                            // Add the scan results to the table
+                            Object.entries(data.status).forEach(([machine, result]) => {
+                                // If result is undetected, show green, otherwise show red
+                                var resultColor = result.result === 'Undetected' ? 'green' : 'red';
+
+                                // If badBytes are present, display them in a modal
+                                var badBytes = result.badBytes ? '<button class="btn btn-secondary btn-sm" onclick="displayBadBytes(\'' + result.badBytes + '\')">View</button>' : 'N/A';
+
+                                table.innerHTML += `<tr><td>${machine}</td><td style="color: ${resultColor};">${result.result}</td><td>${badBytes}</td></tr>`;
+                            });
+
+                            // Show the scan results table
+                            table.style.display = 'table';
+
+                            // Stop querying the server
+                            clearInterval(interval);
+
+                            // Delete sample
+                            deleteSample(id);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching scan results:', error);
+                        // Optionally handle the error, e.g., by showing an error message to the user
+                    });
+                }, 5000);
+            }
+
+            // Function to handle sample deletion
+            function deleteSample(id) {
+                fetch('/api/v1/sample/delete/' + id, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                })
+            }
+
+            // Function to handle scanning
+            async function scan() {
+                // Check if we have a payload to upload
+                if(!isFileInputEmpty()) {
+                    // Generate random id
+                    id = generateID()
+
+                    // Upload the file to the server
+                    uploadFile(id);
+                    
+                    // Sleep for 1 seconds
+                    await sleep(1000);
+
+                    // Get file information
+                    getFileInfo(id);
+
+                    // Get scan results
+                    getScanResults(id);
+                } else {
+                    alert('Please select a file to upload.');
+                }
+            }
+        </script>
+    </body>
 </html>
