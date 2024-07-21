@@ -8,9 +8,9 @@
   
 </div>
 
->:warning: **This project is still in development, and is not ready for use.**
-
 ## Demo
+
+https://github.com/user-attachments/assets/543336a6-398d-4ca2-96f1-b60182e8ecb3
 
 ## Quick Start
 
