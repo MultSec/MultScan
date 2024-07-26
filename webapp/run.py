@@ -15,4 +15,3 @@ if __name__ == "__main__":
         turnOffMachines()
         cleanUploads()
         Log.info("Shutting down server")
-
