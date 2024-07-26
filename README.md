@@ -8,9 +8,9 @@
   
 </div>
 
->:warning: **This project is still in development, and is not ready for use.**
-
 ## Demo
+
+https://github.com/user-attachments/assets/543336a6-398d-4ca2-96f1-b60182e8ecb3
 
 ## Quick Start
 
@@ -29,35 +29,29 @@ docker run -p 80:8080 multscan
 The project requires a configuration file to be created in the webapp directory. The file should be named `config.yml` and should contain the following:
 
 ```yaml
-# config.yml
 config:
   connector:
-    connector_type: "proxmox"
-    connector_url: "https://proxmox.example.com:8006/api2/json"
-    connector_user: "root@pam"
-    connector_password: "password"
+    type: "example"
+    url: "https://example.example.com:8006/api2/json"
+    user: "root@pam"
+    password: "password"
   machines:
-    - machine_name: "machine1"
-      machine_ip: "10.10.10.10"
-    - machine_name: "machine2"
-      machine_ip: "10.10.10.11"
+    - name: "machine1"
+      ip: "10.10.10.10"
+    - name: "machine2"
+      ip: "10.10.10.11"
 ```
 
 #### Connector
 The connector section is used to define the connector type and the credentials required to connect to the connector. As of now, the only supported connector is Proxmox but more can be easily added. The connector should contain the following fields:
 
-- `connector_type`: The type of connector to use.
-- `connector_url`: The URL of the connector.
-- `connector_user`: The username to use to connect to the connector.
-- `connector_password`: The password to use to connect to the connector.
+- `type`: The type of connector to use.
+- `url`: The URL of the connector.
+- `user`: The username to use to connect to the connector.
+- `password`: The password to use to connect to the connector.
 
 #### Machines
 The machines section is used to define the machines that MultScan will use for scanning. The machines should contain the following fields:
 
-- `machine_name`: The name of the machine.
-- `machine_ip`: The IP address of the machine.
-      - Static Analysis Trigger
-          - [ ] Binary Search
-      - Dynamic Analysis Trigger
-          - [ ] On Execution
-          - [ ] On Finish
+- `name`: The name of the machine.
+- `ip`: The IP address of the machine.
