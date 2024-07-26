@@ -121,7 +121,7 @@ def getSampleStatus(id):
         # Request scan to agents
         Log.info(f"[\033[34m{id}\033[0m] Requesting sample scan")
         for machine in app.config['config']['machines']:
-            Log.subsection(f"[\033[34m{id}\033[0m] Requesting {machine['name']}({machine['ip']}) for scan")
+            Log.subsection(f"[\033[34m{id}\033[0m] Requesting {machine['name']} ({machine['ip']}) for scan")
             # TODO
     else:
         # Check status on agents
@@ -133,7 +133,7 @@ def getSampleStatus(id):
         
         # Update each machine status
         for machine in app.config['config']['machines']:
-            Log.subsection(f"[\033[34m{id}\033[0m] Requesting {machine['name']}({machine['ip']}) for scan")
+            Log.subsection(f"[\033[34m{id}\033[0m] Requesting {machine['name']} ({machine['ip']}) for scan")
             # TODO: Add code to query machine for current status
 
 

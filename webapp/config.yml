@@ -1,7 +1,7 @@
 config:
   connector:
     type: "proxmox"
-    url: "https://proxmox.example.com:8006/api2/json"
+    url: "proxmox.example.com"
     user: "root@pam"
     password: "password"
   machines:
