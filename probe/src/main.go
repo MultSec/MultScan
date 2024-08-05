@@ -2,10 +2,45 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"fmt"
 	"sync"
 	"net/http"
+
+	"github.com/mgutz/ansi"
 )
+
+type Log int64
+
+const (
+    logError Log = iota
+    logInfo
+    logStatus
+    logInput
+	logSuccess
+	logSection
+	logSubSection
+)
+
+// Function to print logs
+func printLog(log Log, text string) {
+	switch log {
+	case logError:
+		fmt.Printf("[%s] %s %s\n", ansi.ColorFunc("red")("!"), ansi.ColorFunc("red")("ERROR:"), ansi.ColorFunc("cyan")(text))
+	case logInfo:
+		fmt.Printf("[%s] %s\n", ansi.ColorFunc("blue")("*"), text)
+	case logStatus:
+		fmt.Printf("[*] %s\n", text)
+	case logInput:
+		fmt.Printf("[%s] %s", ansi.ColorFunc("yellow")("?"), text)
+	case logSuccess:
+		fmt.Printf("[%s] %s\n", ansi.ColorFunc("green")("+"), text)
+	case logSection:
+		fmt.Printf("\t[%s] %s\n", ansi.ColorFunc("yellow")("-"), text)
+	case logSubSection:
+		fmt.Printf("\t\t[%s] %s\n", ansi.ColorFunc("magenta")(">"), text)
+	}
+}
 
 type Task struct {
 	BadBytes string  `json:"badBytes"`
@@ -18,39 +53,14 @@ type TaskStore struct {
 	sync.Mutex
 
 	tasks  map[string]Task
+	serverAddress string
 }
 
-func New() *TaskStore {
+func NewTaskStore() *TaskStore {
 	ts := &TaskStore{}
 	ts.tasks = make(map[string]Task)
+	ts.serverAddress = ""
 	return ts
-}
-
-// GetTask retrieves a task from the store, by id. If no such id exists, 
-// then its created
-func (ts *TaskStore) GetTask(id string) (Task, error) {
-	ts.Lock()
-	defer ts.Unlock()
-
-	t, ok := ts.tasks[id]
-	if ok {
-		return t, nil
-	} else {
-		return Task{}, fmt.Errorf("task with id=%d not found", id)
-	}
-}
-
-// CreateTask creates a new task in the store.
-func (ts *TaskStore) CreateTask(id string, badBytes string, result string) {
-	ts.Lock()
-	defer ts.Unlock()
-
-	task := Task{
-		BadBytes: 	badBytes,
-		Result:  	result
-	}
-
-	ts.tasks[id] = task
 }
 
 // DeleteTask deletes the task with the given id. If no such id exists, an error
@@ -67,30 +77,43 @@ func (ts *TaskStore) DeleteTask(id string) error {
 	return nil
 }
 
-func reqHandler() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// Extract the remote address from address
-		remoteAddr := r.RemoteAddr
+// GetTaskStatus retrieves a task from the store, by id. If no such id exists, 
+// then its created
+func (ts *TaskStore) GetTaskStatus(id string) Task {
+	ts.Lock()
+	defer ts.Unlock()
 
-		// Download payload
+	task, ok := ts.tasks[id]
+	if ok {
+		printLog(logInfo, fmt.Sprintf("[%s] Deliverying task", ansi.ColorFunc("default+hb")(id)))
+
+		return task
+	} else {
+		printLog(logInfo, fmt.Sprintf("[%s] Creating task", ansi.ColorFunc("default+hb")(id)))
+
+		// Creates a new task in the store.
+		task := Task{
+			BadBytes: 	"",
+			Result:  	"Scanning",
+		}
+	
+		ts.tasks[id] = task
+
+		return task
 	}
 }
 
-func (ts *taskServer) getTaskHandler(w http.ResponseWriter, req *http.Request) {
-	log.Printf("handling get task at %s\n", req.URL.Path)
-  
-	id, err := req.PathValue("id")
-	if err != nil {
-	  http.Error(w, "invalid id", http.StatusBadRequest)
-	  return
+func (ts *TaskStore) getTaskStatusHandler(w http.ResponseWriter, req *http.Request) {	
+	// Check if server address is set
+	if ts.serverAddress == "" {
+		printLog(logInfo, fmt.Sprintf("%s %s", ansi.ColorFunc("default+hb")("Server Address: "), ansi.ColorFunc("cyan")(req.RemoteAddr)))
+		ts.serverAddress = req.RemoteAddr
 	}
   
-	task, err := ts.store.GetTask(id)
-	if err != nil {
-	  http.Error(w, err.Error(), http.StatusNotFound)
-	  return
-	}
-  
+	id := req.PathValue("id")
+
+	task := ts.GetTaskStatus(id)
+
 	js, err := json.Marshal(task)
 	if err != nil {
 	  http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -98,13 +121,13 @@ func (ts *taskServer) getTaskHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
-  }
+}
 
 func main() {
 	mux := http.NewServeMux()
-	server := NewTaskServer()
+	server := NewTaskStore()
 
-	mux.HandleFunc("GET /task/{id}/", server.getTaskHandler)
+	mux.HandleFunc("GET /task/{id}", server.getTaskStatusHandler)
 
 	log.Fatal(http.ListenAndServe("localhost:9090", mux))
 }
