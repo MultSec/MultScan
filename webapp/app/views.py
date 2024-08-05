@@ -53,6 +53,7 @@ def getFileInfo(id):
 def getStatus(id):
     return jsonify(getSampleStatus(id))
 
+# Request a sample deletion for a given id
 @app.route('/api/v1/sample/delete/<id>', methods=['GET'])
 def deleteSample(id):
     # Remove directory
@@ -61,6 +62,20 @@ def deleteSample(id):
 
     # Return the success message
     return jsonify({"message": "Sample deleted successfully"})
+
+# Request a sample download for a given id
+@app.route('/api/v1/sample/download/<id>', methods=['GET'])
+def deleteSample(id):
+    file_path = os.path.abspath(f'./uploads/{id}/sample')
+
+    # Check if the file exists
+    if os.path.exists(file_path):
+        # Send the file to the client
+        result = send_file(file_path, as_attachment=True)
+    else:
+        result = jsonify({"error": "File not found"}), 404
+
+    return result
 
 # Route for errors
 @app.errorhandler(404)

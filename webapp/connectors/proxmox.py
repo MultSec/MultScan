@@ -53,7 +53,7 @@ def vm_action(action):
 
         return True
     except Exception as e:
-        print(f"Error {action}ing VMs: {str(e)}")
+        Log.error(f"Error {action}ing VMs: {str(e)}")
         return False
 
 def turnOn():
