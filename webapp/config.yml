@@ -6,6 +6,4 @@ config:
     password: "password"
   machines:
     - name: "machine1"
-      ip: "10.10.10.10"
-    - name: "machine2"
-      ip: "10.10.10.11"
+      ip: "127.0.0.1"

@@ -65,7 +65,7 @@ def deleteSample(id):
 
 # Request a sample download for a given id
 @app.route('/api/v1/sample/download/<id>', methods=['GET'])
-def deleteSample(id):
+def downloadSample(id):
     file_path = os.path.abspath(f'./uploads/{id}/sample')
 
     # Check if the file exists

@@ -86,6 +86,10 @@ func (ts *TaskStore) GetTaskStatus(id string) Task {
 	task, ok := ts.tasks[id]
 	if ok {
 		printLog(logInfo, fmt.Sprintf("[%s] Deliverying task", ansi.ColorFunc("default+hb")(id)))
+		
+		// Mock scanned complete
+		task.BadBytes = "MDAwNDhlM2QKMDAwMDAwMDAgIDY1IDc0IDVmIDYxIDY0IDY0IDY5IDc0ICA2OSA2ZiA2ZSA2MSA2YyA1ZiA3NCA2OSAgfGV0X2FkZGl0aW9uYWxfdGl8CjAwMDAwMDEwICA2MyA2YiA2NSA3NCA3MyAwMCA2NyA2NSAgNzQgNWYgNzQgNjkgNjMgNmIgNjUgNzQgIHxja2V0cy5nZXRfdGlja2V0fAowMDAwMDAyMCAgNzMgMDAgNzMgNjUgNzQgNWYgNzQgNjkgIDYzIDZiIDY1IDc0IDczIDAwIDUzIDc5ICB8cy5zZXRfdGlja2V0cy5TeXwKMDAwMDAwMzAgIDczIDc0IDY1IDZkIDJlIDRlIDY1IDc0ICAyZSA1MyA2ZiA2MyA2YiA2NSA3NCA3MyAgfHN0ZW0uTmV0LlNvY2tldHN8"
+		task.Result = "Detected"
 
 		return task
 	} else {

@@ -122,7 +122,12 @@ def getSampleStatus(id):
         Log.info(f"[\033[34m{id}\033[0m] Requesting sample scan")
         for machine in app.config['config']['machines']:
             Log.subsection(f"[\033[34m{id}\033[0m] Requesting {machine['name']} ({machine['ip']}) for scan")
-            # TODO
+            
+            response = requests.get(f"http://{machine['ip']}:9090/task/{id}")
+
+            # Check if the request was successful
+            if response.status_code != 200:
+                Log.error(f"Request failed with status code: {response.status_code}")
     else:
         # Check status on agents
         Log.info(f"[\033[34m{id}\033[0m] Checking sample scan status")
@@ -134,16 +139,15 @@ def getSampleStatus(id):
         # Update each machine status
         for machine in app.config['config']['machines']:
             Log.subsection(f"[\033[34m{id}\033[0m] Requesting {machine['name']} ({machine['ip']}) for scan")
-            # TODO: Add code to query machine for current status
+            
+            response = requests.get(f"http://{machine['ip']}:9090/task/{id}")
 
-
-            # Example mock update
-            machine_name = machine["name"]
-            if machine_name == "machine1":
-                status["status"][machine_name]["badBytes"] = "MDAwNDhlM2QKMDAwMDAwMDAgIDY1IDc0IDVmIDYxIDY0IDY0IDY5IDc0ICA2OSA2ZiA2ZSA2MSA2YyA1ZiA3NCA2OSAgfGV0X2FkZGl0aW9uYWxfdGl8CjAwMDAwMDEwICA2MyA2YiA2NSA3NCA3MyAwMCA2NyA2NSAgNzQgNWYgNzQgNjkgNjMgNmIgNjUgNzQgIHxja2V0cy5nZXRfdGlja2V0fAowMDAwMDAyMCAgNzMgMDAgNzMgNjUgNzQgNWYgNzQgNjkgIDYzIDZiIDY1IDc0IDczIDAwIDUzIDc5ICB8cy5zZXRfdGlja2V0cy5TeXwKMDAwMDAwMzAgIDczIDc0IDY1IDZkIDJlIDRlIDY1IDc0ICAyZSA1MyA2ZiA2MyA2YiA2NSA3NCA3MyAgfHN0ZW0uTmV0LlNvY2tldHN8"
-                status["status"][machine_name]["result"] = "Detected"
+            # Check if the request was successful
+            if response.status_code == 200:
+                # Update sample status
+                status["status"][machine["name"]] = response.json()
             else:
-                status["status"][machine_name]["result"] = "Undetected"
+                Log.error(f"Request failed with status code: {response.status_code}")
 
         # Update status file
         with open(statusFilePath, 'w') as statusFile:
