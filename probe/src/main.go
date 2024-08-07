@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"sync"
 	"net/http"
+	"time"
+	"strings"
 
 	"github.com/mgutz/ansi"
 )
@@ -53,13 +55,13 @@ type TaskStore struct {
 	sync.Mutex
 
 	tasks  map[string]Task
-	serverAddress string
+	serverIP string
 }
 
 func NewTaskStore() *TaskStore {
 	ts := &TaskStore{}
 	ts.tasks = make(map[string]Task)
-	ts.serverAddress = ""
+	ts.serverIP = ""
 	return ts
 }
 
@@ -81,37 +83,53 @@ func (ts *TaskStore) DeleteTask(id string) error {
 // then its created
 func (ts *TaskStore) GetTaskStatus(id string) Task {
 	ts.Lock()
-	defer ts.Unlock()
-
-	task, ok := ts.tasks[id]
-	if ok {
+	task, exists := ts.tasks[id]
+	if exists {
+		ts.Unlock()
 		printLog(logInfo, fmt.Sprintf("[%s] Deliverying task", ansi.ColorFunc("default+hb")(id)))
-		
-		// Mock scanned complete
-		task.BadBytes = "MDAwNDhlM2QKMDAwMDAwMDAgIDY1IDc0IDVmIDYxIDY0IDY0IDY5IDc0ICA2OSA2ZiA2ZSA2MSA2YyA1ZiA3NCA2OSAgfGV0X2FkZGl0aW9uYWxfdGl8CjAwMDAwMDEwICA2MyA2YiA2NSA3NCA3MyAwMCA2NyA2NSAgNzQgNWYgNzQgNjkgNjMgNmIgNjUgNzQgIHxja2V0cy5nZXRfdGlja2V0fAowMDAwMDAyMCAgNzMgMDAgNzMgNjUgNzQgNWYgNzQgNjkgIDYzIDZiIDY1IDc0IDczIDAwIDUzIDc5ICB8cy5zZXRfdGlja2V0cy5TeXwKMDAwMDAwMzAgIDczIDc0IDY1IDZkIDJlIDRlIDY1IDc0ICAyZSA1MyA2ZiA2MyA2YiA2NSA3NCA3MyAgfHN0ZW0uTmV0LlNvY2tldHN8"
-		task.Result = "Detected"
-
-		return task
-	} else {
-		printLog(logInfo, fmt.Sprintf("[%s] Creating task", ansi.ColorFunc("default+hb")(id)))
-
-		// Creates a new task in the store.
-		task := Task{
-			BadBytes: 	"",
-			Result:  	"Scanning",
-		}
-	
-		ts.tasks[id] = task
-
 		return task
 	}
+
+	printLog(logInfo, fmt.Sprintf("[%s] Creating task", ansi.ColorFunc("default+hb")(id)))
+
+	// Creates a new task in the store.
+	task = Task{
+		BadBytes: 	"",
+		Result:  	"Scanning",
+	}
+
+	ts.tasks[id] = task
+	ts.Unlock()
+
+	go ts.backgroundScan(id)
+
+	return task
 }
 
+// Function that handles sample download and scans
+func (ts *TaskStore) backgroundScan(id string) {
+	printLog(logSubSection, fmt.Sprintf("[%s] Downloading sample from Server", ansi.ColorFunc("default+hb")(id)))
+
+    // Simulate work
+    time.Sleep(15 * time.Second)
+    
+    ts.Lock()
+    defer ts.Unlock()
+    
+    if task, exists := ts.tasks[id]; exists {
+        // Mock scanned complete
+        task.BadBytes = "MDAwNDhlM2QKMDAwMDAwMDAgIDY1IDc0IDVmIDYxIDY0IDY0IDY5IDc0ICA2OSA2ZiA2ZSA2MSA2YyA1ZiA3NCA2OSAgfGV0X2FkZGl0aW9uYWxfdGl8CjAwMDAwMDEwICA2MyA2YiA2NSA3NCA3MyAwMCA2NyA2NSAgNzQgNWYgNzQgNjkgNjMgNmIgNjUgNzQgIHxja2V0cy5nZXRfdGlja2V0fAowMDAwMDAyMCAgNzMgMDAgNzMgNjUgNzQgNWYgNzQgNjkgIDYzIDZiIDY1IDc0IDczIDAwIDUzIDc5ICB8cy5zZXRfdGlja2V0cy5TeXwKMDAwMDAwMzAgIDczIDc0IDY1IDZkIDJlIDRlIDY1IDc0ICAyZSA1MyA2ZiA2MyA6YiA2NSA3NCA3MyAgfHN0ZW0uTmV0LlNvY2tldHN8"
+        task.Result = "Detected"
+        ts.tasks[id] = task
+    }
+}
+
+// Handler for the Tasks Status GET request
 func (ts *TaskStore) getTaskStatusHandler(w http.ResponseWriter, req *http.Request) {	
 	// Check if server address is set
-	if ts.serverAddress == "" {
-		printLog(logInfo, fmt.Sprintf("%s %s", ansi.ColorFunc("default+hb")("Server Address: "), ansi.ColorFunc("cyan")(req.RemoteAddr)))
-		ts.serverAddress = req.RemoteAddr
+	if ts.serverIP == "" {
+		ts.serverIP = strings.Split(req.RemoteAddr, ":")[0]
+		printLog(logInfo, fmt.Sprintf("%s %s", ansi.ColorFunc("default+hb")("Server IP: "), ansi.ColorFunc("cyan")(ts.serverIP)))
 	}
   
 	id := req.PathValue("id")
